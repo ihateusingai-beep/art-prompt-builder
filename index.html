@@ -3,42 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>節日畫畫提詞器 ｜ SEN 老師多節日 AI 提詞工具</title>
-<meta name="description" content="SEN 老師用嘅多節日畫畫提詞工具 — 中度智障程度學生 5 步 wizard pick who/act/style/color → 即場生成 AI prompt。中秋 / 春節 / 聖誕 / 端午。">
+<title>將軍澳培智學校 ｜ 節日畫畫提詞器</title>
+<meta name="description" content="將軍澳培智學校（Tseung Kwan O Pui Chi School）SEN 老師用嘅多節日畫畫提詞工具 — 中度智障程度學生 5 步 wizard pick who/act/style/color → 即場生成 AI prompt。中秋 / 春節 / 聖誕 / 端午。">
 <link rel="canonical" href="https://ihateusingai-beep.github.io/art-prompt-builder/">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-    background: linear-gradient(180deg, #fffbeb 0%, #fed7aa 100%);
-    color: #9a3412;
+    background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 50%, #fbcfe8 100%);
+    color: #1e3a8a;
     min-height: 100vh;
     padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
   }
   .container {
     max-width: 64rem;
     margin: 0 auto;
+    width: 100%;
+    flex: 1;
   }
   header {
     text-align: center;
     margin-bottom: 2rem;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 1rem;
+    padding: 1.5rem 1rem;
+    box-shadow: 0 4px 16px rgba(59,130,246,0.12);
+  }
+  .school-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 0.75rem;
+    display: block;
+    border-radius: 50%;
+    background: white;
+    padding: 4px;
+    box-shadow: 0 2px 8px rgba(30,64,175,0.18);
+  }
+  .school-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e40af;
+    margin-bottom: 0.25rem;
+    letter-spacing: 0.05em;
+  }
+  .school-name-en {
+    font-size: 0.875rem;
+    color: #3b82f6;
+    opacity: 0.85;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
   }
   h1 {
     font-size: 1.875rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
+    color: #1e40af;
   }
   .tagline {
     font-size: 1rem;
     opacity: 0.85;
     line-height: 1.5;
+    color: #1e40af;
   }
   .version-badge {
     display: inline-block;
     margin-top: 0.5rem;
     padding: 0.25rem 0.75rem;
-    background: #fde68a;
-    color: #92400e;
+    background: linear-gradient(135deg, #dbeafe, #fbcfe8);
+    color: #1e40af;
     border-radius: 9999px;
     font-size: 0.75rem;
     font-weight: 600;
@@ -57,29 +92,30 @@
   }
   .card {
     background: #fff;
-    border: 2px solid transparent;
+    border: 2px solid #bfdbfe;
     border-radius: 1rem;
     padding: 1.5rem;
     text-align: center;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(59,130,246,0.08);
     font: inherit;
     color: inherit;
     width: 100%;
   }
   .card:hover:not(.disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(154, 52, 18, 0.15);
-    border-color: #fed7aa;
+    box-shadow: 0 8px 16px rgba(59,130,246,0.18);
+    border-color: #f9a8d4;
   }
   .card:focus-visible {
-    outline: 3px solid #f59e0b;
+    outline: 3px solid #f9a8d4;
     outline-offset: 2px;
   }
   .card.disabled {
     opacity: 0.7;
     cursor: not-allowed;
+    border-color: #e5e7eb;
   }
   .icon {
     font-size: 3rem;
@@ -90,11 +126,13 @@
     font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: 0.25rem;
+    color: #1e40af;
   }
   .name-en {
     font-size: 0.875rem;
     opacity: 0.65;
     margin-bottom: 0.75rem;
+    color: #3b82f6;
   }
   .status {
     display: inline-block;
@@ -103,25 +141,34 @@
     font-size: 0.75rem;
     font-weight: 600;
   }
-  .status.ready { background: #d1fae5; color: #065f46; }
-  .status.pending { background: #fef3c7; color: #92400e; }
+  .status.ready { background: linear-gradient(135deg, #fbcfe8, #f9a8d4); color: #831843; }
+  .status.pending { background: #dbeafe; color: #1e40af; }
   footer {
     text-align: center;
     font-size: 0.875rem;
-    opacity: 0.65;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(154, 52, 18, 0.2);
+    color: #1e40af;
+    opacity: 0.85;
+    padding: 1rem;
+    border-top: 1px solid rgba(59,130,246,0.2);
+    margin-top: 2rem;
   }
-  footer a { color: #9a3412; text-decoration: underline; }
+  footer p { margin-bottom: 0.25rem; }
+  footer a { color: #1e40af; text-decoration: underline; }
+  .footer-divider {
+    margin: 0.5rem auto;
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #93c5fd, transparent);
+  }
   .toast {
     position: fixed;
     bottom: 1.5rem;
     right: 1.5rem;
-    background: #1f2937;
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
     color: #fff;
     padding: 1rem 1.5rem;
     border-radius: 0.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(30,64,175,0.25);
     font-size: 0.875rem;
     opacity: 0;
     transform: translateY(8px);
@@ -138,9 +185,14 @@
 <body>
 <div class="container">
   <header>
-    <h1>🌕 節日畫畫提詞器</h1>
-    <p class="tagline">SEN 老師用嘅多節日 AI 提詞工具 — 同學 5 步揀，AI 即刻出圖</p>
-    <span class="version-badge">v1.4.1 · 多節日 platform</span>
+    <img class="school-logo"
+         src="https://www.puichi.edu.hk/it-school/php/webcms/files/upload/tinymce//1a__pui_chi_logo_png_1791177564.png"
+         alt="將軍澳培智學校校徽">
+    <div class="school-name">將軍澳培智學校</div>
+    <div class="school-name-en">Tseung Kwan O Pui Chi School</div>
+    <h1>🎨 節日畫畫提詞器</h1>
+    <p class="tagline">SEN 老師用嘅多節日 AI 提詞工具 — 同學 5 步揀,AI 即刻出圖</p>
+    <span class="version-badge">v1.4.2 · 多節日 platform</span>
   </header>
 
   <main>
@@ -187,8 +239,10 @@
   </main>
 
   <footer>
-    <p>畀香港 SEN 老師用嘅 zero-backend single-file HTML app</p>
-    <p style="margin-top: 0.5rem;">
+    <p><strong>將軍澳培智學校</strong> · Tseung Kwan O Pui Chi School</p>
+    <p class="footer-divider"></p>
+    <p>Copyright © Tseung Kwan O Pui Chi School. All Rights Reserved.</p>
+    <p style="margin-top: 0.5rem; font-size: 0.75rem;">
       GitHub:
       <a href="https://github.com/ihateusingai-beep/art-prompt-builder">art-prompt-builder</a>
       · 22 JPGs · localStorage · 離線可用
@@ -246,17 +300,15 @@
         if (id === 'mid-autumn') {
           navigateToMidAutumn();
         } else {
-          showToast('「' + (e.currentTarget.querySelector('.name-zh').textContent) + '」畫畫提詞器仲未 ready，等緊 v1.4.2 — 2026 年底前推出！');
+          showToast('「' + (e.currentTarget.querySelector('.name-zh').textContent) + '」畫畫提詞器仲未 ready,等緊 v1.4.3 — 2026 年底前推出！');
         }
       });
     }
   }
 
-  // On load, restore selection visual feedback (future: highlight selected card)
-  // Currently no visual highlight since only mid-autumn is functional.
   var selected = getSelectedHoliday();
   if (selected) {
-    // No-op for now: log only for debugging
+    // Future: highlight selected card
   }
 
   if (document.readyState === 'loading') {
