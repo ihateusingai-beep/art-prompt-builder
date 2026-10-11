@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>節日畫畫提詞器｜SEN 老師多節日 AI 提詞</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;800&display=swap');
+    body { font-family: 'Noto Sans TC', sans-serif; }
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: fadeIn .35s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .card {
+      border: 3px solid #fde68a;
+      background: #fffbeb;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+      cursor: pointer;
+    }
+    .card:hover { transform: translateY(-2px); }
+    .card.active {
+      border-color: #ea580c;
+      background: #ffedd5;
+      box-shadow: 0 8px 20px -8px rgba(234,88,12,.45);
+    }
+    .card.confirming {
+      border-color: #16a34a;
+      background: #dcfce7;
+      box-shadow: 0 8px 20px -8px rgba(22,163,74,.4);
+    }
+    .glass {
+      background: rgba(255,251,235,.95);
+      backdrop-filter: blur(10px);
+    }
+    .speak-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 34px;
+      height: 34px;
+      background: rgba(255,255,255,0.9);
+      border: 2px solid #fde68a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 13px;
+      color: #ea580c;
+      transition: background .15s, transform .1s;
+      z-index: 5;
+    }
+    .speak-btn:hover { background: #fed7aa; transform: scale(1.1); }
+    .speak-btn.speaking { color: #ea580c; animation: pulse 0.8s infinite; }
+    .speak-btn.no-voice { color: #9ca3af; border-color: #d1d5db; cursor: not-allowed; }
+    .speak-btn.no-voice:hover { transform: none; background: rgba(255,255,255,0.9); }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+    .big-mode .card { min-height: 148px; }
+    .big-mode .card-text { font-size: 1.5rem !important; }
+    .big-mode h2 { font-size: 2.2rem !important; }
+    .big-mode .speak-btn { width: 44px; height: 44px; font-size: 18px; }
+
+    /* Teacher modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
+      z-index: 200; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: white; border-radius: 1.5rem; padding: 2rem;
+      max-width: 560px; width: 96%; max-height: 90vh; overflow-y: auto;
+      border: 4px solid #fde68a;
+    }
+    /* Confirm badge */
+    .confirm-badge {
+      display: none; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%) scale(0);
+      background: #16a34a; color: white; border-radius: 50%;
+      width: 56px; height: 56px; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: bold;
+      box-shadow: 0 4px 16px rgba(22,163,74,.5);
+    }
+    .card.confirming .confirm-badge {
+      display: flex;
+      animation: badgePop .3s cubic-bezier(.34,1.56,.64,1) forwards;
+    }
+    @keyframes badgePop {
+      from { transform: translate(-50%,-50%) scale(0); opacity:0; }
+      to { transform: translate(-50%,-50%) scale(1); opacity:1; }
+    }
+    /* Confirming card: darken image to make checkmark pop */
+    .card.confirming img { filter: brightness(0.45) saturate(0.3); }
+    .card.confirming .card-text { color: #166534 !important; }
+    /* Print styles */
+    @media print {
+      nav, .sticky-top-nav, #prevBtn, #nextWrap, .confirm-section, button, .no-print { display: none !important; }
+      body { background: white; }
+      .step-panel { display: block !important; }
+      #result-panel { display: block !important; position: static !important; width: 100% !important; }
+      .print-card { border: 2px solid #fde68a; border-radius: 1rem; padding: 1rem; margin-bottom: 0.5rem; page-break-inside: avoid; }
+      .print-label { font-size: 0.75rem; color: #9ca3af; font-weight: bold; text-transform: uppercase; }
+      .print-value { font-size: 1.25rem; font-weight: 800; }
+      .print-prompt { border: 3px solid #ea580c; border-radius: 1rem; padding: 1.5rem; margin-top: 1rem; font-size: 1.1rem; line-height: 1.8; }
+
+      /* Worksheet print mode — one card per page (sprint v1.2.1, feature C) */
+      body.worksheet-mode nav,
+      body.worksheet-mode #result-panel,
+      body.worksheet-mode #teacherModal,
+      body.worksheet-mode .no-print,
+      body.worksheet-mode #studentName,
+      body.worksheet-mode #prevBtn,
+      body.worksheet-mode #nextWrap,
+      body.worksheet-mode .speak-btn { display: none !important; }
+      body.worksheet-mode .step-panel {
+        display: block !important;
+        page-break-after: always;
+      }
+      body.worksheet-mode #step-5,
+      body.worksheet-mode .step-panel:last-of-type { display: none !important; }
+      body.worksheet-mode #who-grid,
+      body.worksheet-mode #act-grid,
+      body.worksheet-mode #style-grid,
+      body.worksheet-mode #color-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+      }
+      body.worksheet-mode .card.worksheet-card {
+        page-break-inside: avoid;
+        border: 2px solid #ea580c !important;
+        padding: 0.5rem !important;
+        background: #fffbeb !important;
+      }
+      body.worksheet-mode .card.worksheet-card img {
+        width: 80px !important;
+        height: 80px !important;
+      }
+      body.worksheet-mode .card.worksheet-card .card-text {
+        font-size: 1rem !important;
+      }
+      body.worksheet-mode .card .speak-btn { display: none !important; }
+      body.worksheet-mode .card .confirm-badge { display: none !important; }
+    }
+
+    /* Worksheet screen-mode preview (3-col layout, 4 pages worth of content scrollable) */
+    body.worksheet-mode .step-panel { display: block !important; }
+    body.worksheet-mode .step-panel:not(.active) { display: block !important; }
+    body.worksheet-mode #step-5 { display: none !important; }
+    body.worksheet-mode #who-grid,
+    body.worksheet-mode #act-grid,
+    body.worksheet-mode #style-grid,
+    body.worksheet-mode #color-grid {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+    }
+    body.worksheet-mode .card.worksheet-card {
+      min-height: auto !important;
+      border: 2px solid #ea580c !important;
+      padding: 0.75rem !important;
+      background: #fffbeb !important;
+    }
+    body.worksheet-mode .card.worksheet-card img {
+      width: 80px !important;
+      height: 80px !important;
+    }
+
+    /* Result panel — hidden until all 4 categories picked (SEN accessibility) */
+    #result-panel {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity .25s ease, transform .25s ease;
+    }
+    #result-panel.is-hidden {
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
+    }
+
+    /* Card grids — 2 cols mobile, 3 cols iPad+ (raw CSS to bypass Tailwind breakpoint quirks) */
+    @media (min-width: 500px) {
+      #who-grid, #act-grid, #style-grid, #color-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+    }
+    /* Pick flash animation */
+    @keyframes pickFlash {
+      0% { box-shadow: 0 0 0 0 rgba(234,88,12,.6); }
+      70% { box-shadow: 0 0 0 12px rgba(234,88,12,0); }
+      100% { box-shadow: 0 0 0 0 rgba(234,88,12,0); }
+    }
+    .card.just-picked { animation: pickFlash 0.5s ease-out; }
+    /* Big mode step dots */
+    .big-mode #dots span { width: 20px !important; height: 20px !important; }
+    /* Confirmed summary row glow */
+    @keyframes rowGlow {
+      0%,100% { box-shadow: 0 0 0 0 rgba(234,88,12,.0); }
+      50% { box-shadow: 0 0 0 6px rgba(234,88,12,.25); }
+    }
+    .summary-row-flash { animation: rowGlow 0.6s ease; }
+    /* Toast colors */
+    #toast.orange { background: #ea580c; }
+    #toast.green { background: #16a34a; }
+    #toast.blue { background: #2563eb; }
+
+    /* Theme switcher (v1.4.2 mega scaffold) */
+    .theme-switcher {
+      display: inline-flex;
+      gap: 0.25rem;
+      background: rgba(255,255,255,0.9);
+      border: 2px solid #fde68a;
+      border-radius: 9999px;
+      padding: 0.2rem;
+    }
+    .theme-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .12s, border-color .12s, background .12s;
+    }
+    .theme-btn:hover:not(:disabled) {
+      transform: scale(1.08);
+      background: #fff7ed;
+    }
+    .theme-btn:focus-visible {
+      outline: 3px solid #f59e0b;
+      outline-offset: 2px;
+    }
+    .theme-btn[aria-pressed="true"] {
+      border-color: #ea580c;
+      background: #ffedd5;
+    }
+    .theme-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0,0,0,0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    /* Theme overlay (placeholder for non-functional themes) */
+    #theme-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    #theme-overlay.open {
+      display: flex;
+    }
+    #theme-overlay .overlay-box {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      max-width: 28rem;
+      width: 100%;
+      text-align: center;
+      border: 4px solid #fde68a;
+    }
+    #theme-overlay .overlay-icon {
+      font-size: 4rem;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    #theme-overlay h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #9a3412;
+      margin-bottom: 0.5rem;
+    }
+    #theme-overlay p {
+      color: #57534e;
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+    #theme-overlay .overlay-close {
+      background: #ea580c;
+      color: white;
+      font-weight: 700;
+      padding: 0.6rem 1.5rem;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    #theme-overlay .overlay-close:hover {
+      background: #c2410c;
+    }
+  </style>
+</head>
+<body class="bg-amber-50 text-stone-800 min-h-screen">
+
+  <nav class="sticky top-0 z-40 glass border-b-4 border-orange-200 px-4 py-3">
+    <div class="max-w-3xl mx-auto flex items-center justify-between gap-3">
+      <h1 class="text-xl sm:text-2xl font-extrabold text-orange-700">
+        <i class="fa-solid fa-moon mr-2"></i><span id="navTitle">中秋畫畫提詞器</span>
+      </h1>
+      <div class="flex gap-2 flex-wrap items-center">
+        <div class="theme-switcher" role="toolbar" aria-label="節日主題切換">
+          <button class="theme-btn" type="button" data-theme="mid-autumn" aria-pressed="true" aria-label="中秋節主題">
+            <span aria-hidden="true">🌕</span><span class="sr-only">中秋節</span>
+          </button>
+          <button class="theme-btn" type="button" data-theme="spring-festival" aria-pressed="false" aria-label="春節主題" disabled>
+            <span aria-hidden="true">🧧</span><span class="sr-only">春節</span>
+          </button>
+          <button class="theme-btn" type="button" data-theme="christmas" aria-pressed="false" aria-label="聖誕節主題" disabled>
+            <span aria-hidden="true">🎄</span><span class="sr-only">聖誕節</span>
+          </button>
+          <button class="theme-btn" type="button" data-theme="dragon-boat" aria-pressed="false" aria-label="端午節主題" disabled>
+            <span aria-hidden="true">🐲</span><span class="sr-only">端午節</span>
+          </button>
+        </div>
+        <button id="bigModeBtn" onclick="toggleBigMode()" class="bg-white text-stone-500 font-bold px-3 py-2 rounded-2xl border-2 border-stone-200 text-sm">
+          <i class="fa-solid fa-text-height"></i> 大字
+        </button>
+        <button id="soundToggle" onclick="toggleSound()" aria-label="音效開關" class="bg-white text-stone-500 font-bold px-3 py-2 rounded-2xl border-2 border-stone-200 text-sm">
+          <i class="fa-solid fa-volume-high" id="soundIcon" aria-hidden="true"></i>
+        </button>
+        <button onclick="randomizeAll()" class="bg-yellow-300 text-stone-800 font-extrabold px-3 py-2 rounded-2xl border-2 border-yellow-500 text-sm">
+          <i class="fa-solid fa-dice mr-1"></i>隨機
+        </button>
+        <button onclick="resetAll()" class="bg-white text-stone-500 font-bold px-3 py-2 rounded-2xl border-2 border-stone-200 text-sm">重來</button>
+        <button onclick="openTeacherMode()" class="bg-white text-stone-400 font-bold px-3 py-2 rounded-2xl border-2 border-stone-200 text-sm" title="老師模式">
+          <i class="fa-solid fa-user-gear"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-4 pt-6 pb-80">
+    <!-- Confirm hint banner -->
+    <div id="confirmHint" class="hidden mb-4 bg-green-50 border-3 border-green-400 rounded-2xl px-5 py-3 text-center">
+      <p class="text-green-700 font-extrabold text-lg">
+        <i class="fa-solid fa-hand-pointer mr-2"></i>再撳同一張卡確認 ✅
+      </p>
+    </div>
+
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex gap-2" id="dots"></div>
+      <p class="font-extrabold text-orange-600" id="stepLabel">第 1 步 / 共 5 步</p>
+    </div>
+
+    <!-- Step 1 -->
+    <section id="step-1" class="step-panel active">
+      <h2 class="text-3xl font-extrabold mb-2">👤 邊個係主角？</h2>
+      <p class="text-lg text-stone-600 mb-5">
+        <i class="fa-solid fa-hand-pointer text-orange-400 mr-1"></i>撳卡揀，再撳同一張卡確認 ✅
+      </p>
+      <div class="grid grid-cols-2 gap-3" id="who-grid"></div>
+      <button id="whoMoreBtn" onclick="toggleShowMore('who')" class="hidden mt-3 w-full bg-white text-orange-600 font-extrabold px-4 py-3 rounded-2xl border-2 border-orange-200 text-sm">
+        <i class="fa-solid fa-plus-circle mr-1"></i>顯示更多進階選項
+      </button>
+    </section>
+
+    <!-- Step 2 -->
+    <section id="step-2" class="step-panel">
+      <h2 class="text-3xl font-extrabold mb-2">🎯 佢哋做緊咩？</h2>
+      <p class="text-lg text-stone-600 mb-2">可以揀 <b>1 至 2</b> 件開心嘅事。</p>
+      <p id="actPickHint" class="text-base font-extrabold text-orange-600 mb-4">已揀 0 / 2</p>
+      <div class="grid grid-cols-2 gap-3" id="act-grid"></div>
+      <button id="actMoreBtn" onclick="toggleShowMore('act')" class="hidden mt-3 w-full bg-white text-orange-600 font-extrabold px-4 py-3 rounded-2xl border-2 border-orange-200 text-sm">
+        <i class="fa-solid fa-plus-circle mr-1"></i>顯示更多進階選項
+      </button>
+    </section>
+
+    <!-- Step 3 -->
+    <section id="step-3" class="step-panel">
+      <h2 class="text-3xl font-extrabold mb-2">🎨 畫面係咩感覺？</h2>
+      <p class="text-lg text-stone-600 mb-5">揀一種畫法，愈簡單愈好。</p>
+      <div class="grid grid-cols-2 gap-3" id="style-grid"></div>
+      <button id="styleMoreBtn" onclick="toggleShowMore('style')" class="hidden mt-3 w-full bg-white text-orange-600 font-extrabold px-4 py-3 rounded-2xl border-2 border-orange-200 text-sm">
+        <i class="fa-solid fa-plus-circle mr-1"></i>顯示更多進階選項
+      </button>
+    </section>
+
+    <!-- Step 4 -->
+    <section id="step-4" class="step-panel">
+      <h2 class="text-3xl font-extrabold mb-2">🌙 夜空同顏色</h2>
+      <p class="text-lg text-stone-600 mb-2">可以揀 <b>1 至 2</b> 種顏色（例如金+紅）。</p>
+      <p id="colorPickHint" class="text-base font-extrabold text-orange-600 mb-4">已揀 0 / 2</p>
+      <div class="grid grid-cols-2 gap-3" id="color-grid"></div>
+      <button id="colorMoreBtn" onclick="toggleShowMore('color')" class="hidden mt-3 w-full bg-white text-orange-600 font-extrabold px-4 py-3 rounded-2xl border-2 border-orange-200 text-sm">
+        <i class="fa-solid fa-plus-circle mr-1"></i>顯示更多進階選項
+      </button>
+    </section>
+
+    <!-- Step 5: Summary / Confirm -->
+    <section id="step-5" class="step-panel">
+      <h2 class="text-3xl font-extrabold mb-2">✅ 確認你嘅選擇</h2>
+      <p class="text-lg text-stone-600 mb-5">晒下你揀啲乜？搞掂就撳「生成提詞」！</p>
+      <div class="space-y-3" id="summary-list"></div>
+
+      <!-- Optional student name → affects prompt -->
+      <div class="mt-5 p-4 bg-white rounded-3xl border-4 border-amber-200">
+        <label for="studentName" class="block text-lg font-extrabold text-stone-700 mb-2">
+          ✏️ 學生名字 <span class="text-stone-400 font-bold text-base">（可選）</span>
+        </label>
+        <input id="studentName" type="text" maxlength="20" autocomplete="off"
+          placeholder="例如：小明（唔填都得）"
+          class="w-full text-xl font-extrabold border-4 border-orange-200 rounded-2xl px-4 py-3 focus:border-orange-500 focus:outline-none"
+          oninput="onStudentNameInput()">
+        <p class="text-sm text-stone-500 mt-2 font-semibold">填咗會寫入提詞；唔填就照常生成。</p>
+      </div>
+
+      <div class="mt-6 p-4 bg-orange-50 rounded-3xl border-4 border-orange-200">
+        <p class="text-sm text-stone-500 mb-3 font-bold"><i class="fa-solid fa-magic mr-1"></i>按呢個掣就會生成中秋圖提詞：</p>
+        <button onclick="generatePrompt()" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-xl py-5 rounded-3xl shadow-xl">
+          🌕 生成中秋圖提詞 🌕
+        </button>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <div class="mt-8 flex justify-between items-center">
+      <button id="prevBtn" onclick="go(-1)" class="invisible font-extrabold text-white text-lg px-6 py-4 rounded-3xl bg-stone-400">
+        <i class="fa-solid fa-arrow-left mr-2"></i>返去
+      </button>
+      <div id="nextWrap">
+        <button id="nextBtn" onclick="go(1)" class="bg-orange-500 text-white font-extrabold text-lg px-8 py-4 rounded-3xl shadow-lg">
+          下一頁 <i class="fa-solid fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Result panel -->
+  <div id="result-panel" class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[96%] max-w-3xl z-50">
+    <div class="glass border-4 border-orange-200 rounded-3xl p-4 shadow-xl">
+      <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+        <div class="flex gap-2 flex-wrap">
+          <button id="tabZh" onclick="setTab('zh')" class="px-3 py-1 rounded-xl font-extrabold bg-orange-500 text-white text-sm">繁體中文</button>
+          <button id="tabCn" onclick="setTab('cn')" class="px-3 py-1 rounded-xl font-extrabold bg-white text-stone-500 text-sm">简体中文</button>
+          <button id="tabEn" onclick="setTab('en')" class="px-3 py-1 rounded-xl font-extrabold bg-white text-stone-500 text-sm">English</button>
+        </div>
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="saveToHistory()" class="bg-green-100 text-green-700 font-extrabold px-3 py-1 rounded-xl border-2 border-green-300 text-sm no-print">
+            <i class="fa-solid fa-floppy-disk mr-1"></i>儲存
+          </button>
+          <button onclick="window.print()" class="bg-blue-100 text-blue-700 font-extrabold px-3 py-1 rounded-xl border-2 border-blue-300 text-sm no-print">
+            <i class="fa-solid fa-print mr-1"></i>列印
+          </button>
+          <span class="text-xs font-bold text-stone-500 no-print" id="resultHint">老師可複製去圖像 AI</span>
+        </div>
+      </div>
+      <p id="outZh" class="bg-white rounded-2xl p-3 min-h-[72px] text-base font-semibold leading-relaxed border-2 border-orange-100">
+        請先完成所有選擇。
+      </p>
+      <p id="outCn" class="hidden bg-white rounded-2xl p-3 min-h-[72px] text-base font-semibold leading-relaxed border-2 border-orange-100"></p>
+      <p id="outEn" class="hidden bg-white rounded-2xl p-3 min-h-[72px] text-sm font-medium leading-relaxed border-2 border-orange-100"></p>
+      <button onclick="copyPrompt()" id="copyBtn" class="mt-3 w-full bg-stone-900 text-white font-extrabold py-3 rounded-2xl">
+        <i class="fa-solid fa-copy mr-2"></i>複製提詞
+      </button>
+
+      <!-- Image generation section (sprint v1.2.3, feature E) -->
+      <div id="imageGenSection" class="hidden mt-3 border-t-2 border-orange-100 pt-3">
+        <button id="generateImageBtn" onclick="generateImage()" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-extrabold py-3 rounded-2xl">
+          <i class="fa-solid fa-palette mr-2"></i>生成中秋圖像
+        </button>
+        <div id="imageGenStatus" role="status" aria-live="polite" class="hidden mt-3 text-center text-sm text-stone-600">
+          <i class="fa-solid fa-spinner fa-spin mr-1"></i>生成中... (通常 5-30 秒)
+        </div>
+        <div id="imageGenResult" class="hidden mt-3">
+          <img id="generatedImage" class="w-full rounded-2xl border-2 border-orange-200" alt="">
+          <p id="imageGenPrompt" class="text-xs text-stone-500 mt-2 font-mono break-all"></p>
+          <div class="flex gap-2 mt-2">
+            <a id="downloadImageLink" class="flex-1 bg-blue-100 text-blue-700 font-extrabold px-3 py-2 rounded-xl border-2 border-blue-300 text-sm text-center" href="#" download="midautumn.png">
+              <i class="fa-solid fa-download mr-1"></i>下載
+            </a>
+            <button onclick="generateImage()" class="flex-1 bg-orange-100 text-orange-700 font-extrabold px-3 py-2 rounded-xl border-2 border-orange-300 text-sm">
+              <i class="fa-solid fa-rotate mr-1"></i>重生
+            </button>
+          </div>
+        </div>
+        <div id="imageGenError" class="hidden mt-3 bg-red-50 border-2 border-red-300 rounded-2xl p-3 text-sm">
+          <p class="text-red-700 font-bold mb-2">⚠️ 生成失敗</p>
+          <p id="imageGenErrorMsg" class="text-stone-600 mb-2"></p>
+          <button onclick="generateImage()" class="bg-red-500 text-white font-extrabold px-3 py-1 rounded-xl text-sm">重試</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-orange-600 text-white font-extrabold px-6 py-3 rounded-full opacity-0 pointer-events-none transition z-50">已複製！</div>
+
+  <!-- Teacher mode modal -->
+  <div id="teacherModal" class="modal-overlay" onclick="if(event.target===this)closeTeacherMode()">
+    <div class="modal-box">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-extrabold text-orange-700"><i class="fa-solid fa-user-gear mr-2"></i>老師模式</h2>
+        <button onclick="closeTeacherMode()" class="text-stone-400 hover:text-stone-700 text-2xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- PIN gate -->
+      <div id="pinGate">
+        <p class="text-stone-600 mb-4 font-semibold">請輸入 PIN 碼（四位數字）</p>
+        <div class="flex gap-2 mb-4">
+          <input type="password" id="pinInput" maxlength="4" pattern="[0-9]*" inputmode="numeric"
+            class="flex-1 text-center text-2xl font-bold border-3 border-stone-300 rounded-2xl px-4 py-3 focus:border-orange-400 focus:outline-none"
+            onkeydown="if(event.key==='Enter')checkPin()" placeholder="----">
+          <button onclick="checkPin()" class="bg-orange-500 text-white font-extrabold px-6 py-3 rounded-2xl">確認</button>
+        </div>
+        <p id="pinError" class="text-red-500 font-bold hidden">PIN 錯了，請再試一次。</p>
+        <p class="text-stone-400 text-sm mt-2">預設 PIN：<code class="bg-stone-100 px-2 py-1 rounded">7444</code></p>
+      </div>
+
+      <!-- Teacher panel -->
+      <div id="teacherPanel" class="hidden">
+        <p class="text-green-600 font-extrabold mb-4"><i class="fa-solid fa-check-circle mr-1"></i>已解鎖</p>
+
+        <div class="space-y-4">
+          <!-- Edit who -->
+          <div>
+            <h3 class="font-extrabold text-stone-700 mb-2">👤 主角選項</h3>
+            <div id="edit-who" class="space-y-2"></div>
+          </div>
+          <!-- Edit act -->
+          <div>
+            <h3 class="font-extrabold text-stone-700 mb-2">🎯 活動選項</h3>
+            <div id="edit-act" class="space-y-2"></div>
+          </div>
+          <!-- Edit style -->
+          <div>
+            <h3 class="font-extrabold text-stone-700 mb-2">🎨 畫風選項</h3>
+            <div id="edit-style" class="space-y-2"></div>
+          </div>
+          <!-- History -->
+          <div>
+            <h3 class="font-extrabold text-stone-700 mb-2">📋 歷史記錄</h3>
+            <div id="history-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
+            <button onclick="clearHistory()" class="mt-2 text-sm text-red-500 font-bold underline">清除全部歷史</button>
+          </div>
+          <!-- Change PIN -->
+          <div class="border-t-2 border-stone-200 pt-4">
+            <h3 class="font-extrabold text-stone-700 mb-2">🔑 更改 PIN</h3>
+            <div class="flex gap-2">
+              <input type="password" id="newPinInput" maxlength="4" pattern="[0-9]*" inputmode="numeric"
+                class="flex-1 text-center text-xl font-bold border-3 border-stone-300 rounded-2xl px-4 py-2 focus:border-orange-400 focus:outline-none"
+                placeholder="新 PIN（四位數）">
+              <button onclick="changePin()" class="bg-orange-500 text-white font-extrabold px-5 py-2 rounded-2xl">更改</button>
+            </div>
+          </div>
+          <!-- Worksheet print (sprint v1.2.1, feature C) -->
+          <div class="border-t-2 border-stone-200 pt-4">
+            <h3 class="font-extrabold text-stone-700 mb-2">🖨️ Worksheet 列印</h3>
+            <p class="text-sm text-stone-500 mb-3">每張卡印成獨立一頁，學生可以貼紙 / 圈出嚟揀。</p>
+            <div class="flex items-center gap-3 mb-3">
+              <label class="inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="worksheetToggle" class="sr-only peer" onchange="toggleWorksheetMode(this.checked)">
+                <div class="relative w-11 h-6 bg-stone-300 rounded-full peer-checked:bg-orange-500 transition">
+                  <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition peer-checked:translate-x-5"></div>
+                </div>
+                <span class="ml-3 text-sm font-bold text-stone-700">啟用 Worksheet 列印模式</span>
+              </label>
+            </div>
+            <button onclick="printWorksheet()" id="printWorksheetBtn" class="w-full bg-orange-500 text-white font-extrabold px-4 py-3 rounded-2xl">
+              <i class="fa-solid fa-print mr-1"></i>列印 Worksheet
+            </button>
+          </div>
+          <!-- Image generation (sprint v1.2.3, feature E — OFF by default per user decision) -->
+          <div class="border-t-2 border-stone-200 pt-4">
+            <h3 class="font-extrabold text-stone-700 mb-2">🎨 圖像生成</h3>
+            <p class="text-sm text-stone-500 mb-3">用 Pollinations.ai (免費、免 API key) 即場生成中秋圖。預設關閉，老師自己 enable。</p>
+            <div class="flex items-center gap-3">
+              <label class="inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="imageGenToggle" class="sr-only peer" onchange="toggleImageGen(this.checked)">
+                <div class="relative w-11 h-6 bg-stone-300 rounded-full peer-checked:bg-purple-500 transition">
+                  <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition peer-checked:translate-x-5"></div>
+                </div>
+                <span class="ml-3 text-sm font-bold text-stone-700">允許學生直接生成圖像</span>
+              </label>
+            </div>
+            <button onclick="generateImage()" class="mt-3 w-full bg-purple-100 text-purple-700 font-extrabold px-3 py-2 rounded-2xl border-2 border-purple-300 text-sm">
+              <i class="fa-solid fa-flask mr-1"></i>老師自己預覽生成
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────
+const data = {
+  who: [
+    { id:'family', zh:'一家人', zhCn:'一家人', en:'a happy family together', img:'img/who-family.jpg' },
+    { id:'kids', zh:'小朋友', zhCn:'小朋友', en:'cheerful children', img:'img/who-kids.jpg' },
+    { id:'rabbit', zh:'🐇 兔仔', zhCn:'🐇 兔子', en:'a cute fluffy white rabbit', img:'img/who-rabbit.jpg' },
+    { id:'fairy', zh:'👸 嫦娥', zhCn:'👸 嫦娥', en:'a kind fairy lady Chang-e', img:'img/who-change.jpg' },
+    { id:'cat', zh:'🐱 小貓', zhCn:'🐱 小猫', en:'a fluffy cat wearing a tiny lantern hat', img:'img/who-cat.jpg' },
+    { id:'me', zh:'😊 我自己', zhCn:'😊 我自己', en:'myself as a student character', img:'img/who-me.jpg' },
+    { id:'grandparents', zh:'爺爺奶奶', zhCn:'爷爷奶奶', en:'kind grandpa and grandma', img:'img/who-family.jpg' },
+    { id:'classmates', zh:'老師同學', zhCn:'老师同学', en:'a friendly teacher with classmates', img:'img/who-kids.jpg' },
+    { id:'fairyrabbit', zh:'嫦娥同玉兔', zhCn:'嫦娥和玉兔', en:'Chang-e with the jade rabbit together', img:'img/who-change.jpg' },
+    { id:'friends', zh:'好朋友', zhCn:'好朋友', en:'two happy best friends', img:'img/who-kids.jpg' }
+  ],
+  act: [
+    { id:'moon', zh:'🌝 望月亮', zhCn:'🌝 看月亮', en:'looking at a huge round full moon', img:'img/act-moon.jpg' },
+    { id:'lantern', zh:'🏮 拎燈籠', zhCn:'🏮 提灯笼', en:'holding glowing red paper lanterns', img:'img/act-lantern.jpg' },
+    { id:'cake', zh:'🥮 食月餅', zhCn:'🥮 吃月饼', en:'eating delicious mooncakes', img:'img/act-cake.jpg' },
+    { id:'sky', zh:'🎈 放天燈', zhCn:'🎈 放天灯', en:'releasing warm sky lanterns into the night', img:'img/act-sky.jpg' },
+    { id:'garden', zh:'🌸 花園行', zhCn:'🌸 逛花园', en:'walking in a beautiful garden', img:'img/act-garden.jpg' },
+    { id:'boat', zh:'🌊 湖邊坐', zhCn:'🌊 湖边坐', en:'sitting by a calm lake looking at the moon', img:'img/act-boat.jpg' },
+    { id:'share', zh:'🍰 分享月餅', zhCn:'🍰 分月饼', en:'happily sharing mooncakes with others', img:'img/act-cake.jpg' },
+    { id:'parade', zh:'🚶 提燈遊園', zhCn:'🚶 提灯游园', en:'strolling in a lantern parade in the park', img:'img/act-lantern.jpg' },
+    { id:'photo', zh:'📷 團圓影相', zhCn:'📷 团圆拍照', en:'taking a warm family photo under the moon', img:'img/act-garden.jpg' },
+    { id:'candy', zh:'🍬 食糖仔', zhCn:'🍬 吃糖果', en:'enjoying sweet festive candies', img:'img/act-cake.jpg' }
+  ],
+  style: [
+    { id:'cartoon', zh:'😊 可愛卡通', zhCn:'😊 可爱卡通', en:'simple cute cartoon, big faces, thick outlines, easy to understand', img:'img/style-cartoon.jpg' },
+    { id:'picturebook', zh:'🎨 圖畫書', zhCn:'🎨 图画书', en:'children picture-book watercolor, soft and warm', img:'img/style-picturebook.jpg' },
+    { id:'paper', zh:'✂️ 剪紙畫', zhCn:'✂️ 剪纸画', en:'Chinese paper-cut art, flat colorful shapes, simple patterns', img:'img/style-paper.jpg' },
+    { id:'night', zh:'🌙 夜空', zhCn:'🌙 夜空', en:'gentle night scene, glowing lights, not scary', img:'img/style-night.jpg' },
+    { id:'simple', zh:'✏️ 簡筆畫', zhCn:'✏️ 简笔画', en:'simple line drawing for kids, clear shapes, minimal detail', img:'img/style-cartoon.jpg' },
+    { id:'softnight', zh:'🌌 溫柔夜景', zhCn:'🌌 温柔夜景', en:'soft gentle night watercolor, warm glow, calm and safe', img:'img/style-night.jpg' }
+  ],
+  color: [
+    { id:'gold', zh:'🌝 金黃（月亮）', zhCn:'🌝 金黄（月亮）', en:'golden yellow moon, warm amber light', css:'linear-gradient(135deg,#f59e0b,#fde68a)', img:'img/color-gold.jpg' },
+    { id:'red', zh:'🏮 紅色（燈籠）', zhCn:'🏮 红色（灯笼）', en:'bright festive red lanterns and gold trim', css:'linear-gradient(135deg,#dc2626,#fbbf24)', img:'img/color-red.jpg' },
+    { id:'purple', zh:'🌌 紫色（夜空）', zhCn:'🌌 紫色（夜空）', en:'soft purple-blue night sky with stars', css:'linear-gradient(135deg,#7c3aed,#93c5fd)', img:'img/color-purple.jpg' },
+    { id:'osmanthus', zh:'🌼 黃色（桂花）', zhCn:'🌼 黄色（桂花）', en:'bright yellow and creamy white', css:'linear-gradient(135deg,#eab308,#fff7ed)', img:'img/color-osmanthus.jpg' },
+    { id:'silver', zh:'🌕 銀白（月光）', zhCn:'🌕 银白（月光）', en:'silvery white moonlight and soft cool glow', css:'linear-gradient(135deg,#94a3b8,#f8fafc)', img:'img/color-gold.jpg' },
+    { id:'orange', zh:'🌅 橙紅（燈火）', zhCn:'🌅 橙红（灯火）', en:'warm orange-red lantern light and sunset glow', css:'linear-gradient(135deg,#ea580c,#fbbf24)', img:'img/color-red.jpg' }
+  ]
+};
+
+const NEG_ZH = '唔好恐怖、唔好黑暗、唔好複雜字、唔好模糊、唔好有浮水印';
+const NEG_CN = '不要恐怖、不要黑暗、不要复杂的字、不要模糊、不要有水印、不要拥挤的小细节';
+const NEG_EN = 'no horror, no dark scary mood, no messy text, no blurry faces, no watermark, no crowded tiny details';
+
+const DEFAULT_PIN = '7444';
+const PIN_KEY = 'midautumn_pin';
+
+let step = 1;
+const total = 5;
+let tab = 'zh';
+const MULTI_KEYS = { act: true, color: true };
+const MULTI_MAX = 2;
+let sel = { who: null, act: [], style: null, color: [] };
+let generated = false;
+let bigMode = false;
+let soundOn = true;
+let speakingId = null;
+let hasZhVoice = false;
+let pendingKey = null;   // key awaiting confirm in normal mode
+let pendingId = null;    // id of the pending card
+let _pendingTimer = null;
+
+// ── Voice ────────────────────────────────────────────────────────────────
+// voiceMap tracks the best available voice per language family
+// Fallback chain (per memory rule 13 F1): zh-HK → zh-CN → en
+let voiceMap = { 'zh-hk': null, 'zh-cn': null, 'en': null };
+function detectVoice() {
+  const list = window.speechSynthesis?.getVoices() || [];
+  const lc = v => (v.lang || '').toLowerCase();
+  voiceMap['zh-hk'] = list.find(v => lc(v.lang).startsWith('zh-hk') || lc(v.lang).startsWith('yue')) || null;
+  voiceMap['zh-cn'] = list.find(v => lc(v.lang).startsWith('zh-cn') || lc(v.lang).startsWith('cmn')) || null;
+  voiceMap.en = list.find(v => lc(v.lang).startsWith('en')) || null;
+  hasZhVoice = !!(voiceMap['zh-hk'] || voiceMap['zh-cn']);
+}
+function getVoice() {
+  // Priority: zh-HK → zh-CN → en → first available
+  return voiceMap['zh-hk'] || voiceMap['zh-cn'] || voiceMap.en
+      || (window.speechSynthesis?.getVoices()[0] || null);
+}
+// Unified speak: pass { prefix } to read "你揀咗...", pass btnEl to animate the button
+function speak(text, btnEl) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const msg = (btnEl === 'choice') ? '你揀咗' + text : text;
+  const u = new SpeechSynthesisUtterance(msg);
+  u.lang = voiceMap['zh-hk'] ? 'zh-HK' : voiceMap['zh-cn'] ? 'zh-CN' : 'en';
+  u.rate = 0.85;
+  const v = getVoice();
+  if (v) u.voice = v;
+  if (btnEl && btnEl !== 'choice') {
+    u.onend = u.onerror = () => {
+      if (speakingId === btnEl) {
+        speakingId = null;
+        btnEl?.classList.remove('speaking');
+      }
+    };
+    speakingId = btnEl;
+    btnEl.classList.add('speaking');
+  }
+  window.speechSynthesis.speak(u);
+}
+// Convenience: plays the "你揀咗..." feedback
+function speakChoice(text) {
+  if (!soundOn) return;
+  speak(text, 'choice');
+}
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = () => {
+    detectVoice();
+    renderAll();
+  };
+  window.speechSynthesis.getVoices();
+  setTimeout(detectVoice, 500);
+}
+
+// ── Sound ─────────────────────────────────────────────────────────────────
+let _audioCtx = null;
+function getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+function playChime() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx();
+    const notes = [523, 659, 784, 1047];
+    notes.forEach((freq, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freq;
+      o.type = 'sine';
+      g.gain.setValueAtTime(0.18, ctx.currentTime + i * 0.15);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.5);
+      o.start(ctx.currentTime + i * 0.15);
+      o.stop(ctx.currentTime + i * 0.15 + 0.5);
+    });
+  } catch(e) {}
+}
+function toggleSound() {
+  soundOn = !soundOn;
+  const icon = document.getElementById('soundIcon');
+  icon.className = soundOn ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+  document.getElementById('soundToggle').classList.toggle('bg-orange-100', !soundOn);
+  document.getElementById('soundToggle').classList.toggle('text-orange-700', !soundOn);
+}
+
+// ── Keyboard navigation ──────────────────────────────────────────────────
+// Enter/Space on a card = pick; Tab = natural browser nav
+function onCardKey(e, key, id) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    pick(key, id);
+  }
+}
+// Escape closes teacher modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('teacherModal');
+    if (modal?.classList.contains('open')) closeTeacherMode();
+  }
+});
+
+// ── Render helpers ────────────────────────────────────────────────────────
+const getDataList = key => data[key] || [];
+function isMulti(key) { return !!MULTI_KEYS[key]; }
+function getSelItems(key) {
+  if (isMulti(key)) return Array.isArray(sel[key]) ? sel[key] : [];
+  return sel[key] ? [sel[key]] : [];
+}
+function isItemSelected(key, id) {
+  return getSelItems(key).some(x => x.id === id);
+}
+function hasSelection(key) {
+  return getSelItems(key).length > 0;
+}
+function selLabel(key) {
+  const items = getSelItems(key);
+  if (!items.length) return '';
+  return items.map(x => x.zh).join('、');
+}
+function selLabelCn(key) {
+  const items = getSelItems(key);
+  if (!items.length) return '';
+  return items.map(x => x.zhCn || x.zh).join('、');
+}
+function selLabelEn(key) {
+  const items = getSelItems(key);
+  if (!items.length) return '';
+  return items.map(x => x.en).join(', and ');
+}
+/** Apply pick: single replace; multi toggle add/remove (max MULTI_MAX). Returns 'added'|'removed'|'full'|'set' */
+function applyPick(key, item) {
+  if (isMulti(key)) {
+    const arr = getSelItems(key).slice();
+    const idx = arr.findIndex(x => x.id === item.id);
+    if (idx >= 0) {
+      arr.splice(idx, 1);
+      sel[key] = arr;
+      return 'removed';
+    }
+    if (arr.length >= MULTI_MAX) return 'full';
+    arr.push(item);
+    sel[key] = arr;
+    return 'added';
+  }
+  sel[key] = item;
+  return 'set';
+}
+function updateMultiHints() {
+  const actEl = document.getElementById('actPickHint');
+  const colEl = document.getElementById('colorPickHint');
+  if (actEl) actEl.textContent = `已揀 ${getSelItems('act').length} / ${MULTI_MAX}`;
+  if (colEl) colEl.textContent = `已揀 ${getSelItems('color').length} / ${MULTI_MAX}`;
+}
+
+function renderCard(item, key) {
+  const isActive = isItemSelected(key, item.id);
+  const isConfirming = !bigMode && pendingKey === key && pendingId === item.id;
+  const voiceClass = !hasZhVoice ? 'no-voice' : '';
+  const voiceTitle = !hasZhVoice ? '此裝置無粵語語音' : '朗讀';
+  const voiceIcon = !hasZhVoice ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+  const cardClass = isConfirming ? 'confirming' : isActive ? 'active' : '';
+  const flashClass = isConfirming ? 'just-picked' : '';
+  // Escape single quotes in zh for inline onclick
+  const zhSafe = String(item.zh).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+  // Color cards: use CSS gradient, no image
+  if (key === 'color') {
+    const css = item.css || '';
+    return `
+      <div class="card worksheet-card rounded-3xl p-3 text-center relative ${cardClass} ${flashClass}"
+           style="min-height:170px;background:${css};background-size:cover"
+           tabindex="0" onkeydown="onCardKey(event,'${key}','${item.id}')">
+        <button class="speak-btn ${voiceClass}" onclick="event.stopPropagation();speak('${zhSafe}', this)" title="${voiceTitle}">
+          <i class="${voiceIcon}"></i>
+        </button>
+        <div class="w-full h-full flex flex-col items-center justify-center" onclick="pick('${key}','${item.id}')">
+          <span class="card-text text-lg font-extrabold mt-10 leading-tight" style="text-shadow:0 1px 4px rgba(0,0,0,.5);color:white">${item.zh}</span>
+        </div>
+        <div class="confirm-badge"><i class="fa-solid fa-check"></i></div>
+      </div>`;
+  }
+
+  // Normal cards with image
+  const imgStyle = key === 'style' ? 'width:110px;height:80px;object-fit:cover;border-radius:14px;border:3px solid #fde68a;' : 'width:90px;height:90px;object-fit:cover;border-radius:16px;border:3px solid #fde68a;';
+  return `
+    <div class="card worksheet-card rounded-3xl p-3 text-center relative ${cardClass} ${flashClass}"
+         style="min-height:170px"
+         tabindex="0" onkeydown="onCardKey(event,'${key}','${item.id}')">
+      <button class="speak-btn ${voiceClass}" onclick="event.stopPropagation();speak('${zhSafe}', this)" title="${voiceTitle}">
+        <i class="${voiceIcon}"></i>
+      </button>
+      <button class="w-full h-full flex flex-col items-center justify-center gap-1" onclick="pick('${key}','${item.id}')">
+        <img src="${item.img}" alt="${item.zh}" style="${imgStyle}" loading="lazy">
+        <span class="card-text text-lg font-extrabold mt-1 leading-tight">${item.zh}</span>
+      </button>
+      <div class="confirm-badge"><i class="fa-solid fa-check"></i></div>
+    </div>`;
+}
+
+// ── Render full grids ─────────────────────────────────────────────────────
+// Default visible count per category (rest = "advanced" hidden behind toggle)
+// SEN-friendly: keep only the most concrete / common options on first paint.
+const DEFAULT_COUNTS = { who: 6, act: 6, style: 4, color: 4 };
+const SHOW_MORE_KEY = 'midautumn_show_more';
+let showMore = { who: false, act: false, style: false, color: false };
+// Single factory: pass the grid element id + the data key
+const renderGrid = (id, key) => {
+  const all = getDataList(key);
+  const limit = showMore[key] ? all.length : (DEFAULT_COUNTS[key] ?? all.length);
+  document.getElementById(id).innerHTML = all.slice(0, limit).map(item => renderCard(item, key)).join('');
+};
+
+// Show "more" toggle button only when there ARE hidden options
+function updateMoreButtons() {
+  [['who', 'whoMoreBtn'], ['act', 'actMoreBtn'], ['style', 'styleMoreBtn'], ['color', 'colorMoreBtn']].forEach(([key, btnId]) => {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    const hasHidden = getDataList(key).length > (DEFAULT_COUNTS[key] ?? 0);
+    btn.classList.toggle('hidden', !hasHidden);
+    btn.innerHTML = showMore[key]
+      ? '<i class="fa-solid fa-minus-circle mr-1"></i>收埋進階選項'
+      : `<i class="fa-solid fa-plus-circle mr-1"></i>顯示更多進階選項 (${getDataList(key).length - (DEFAULT_COUNTS[key] ?? 0)} 個)`;
+  });
+}
+
+function toggleShowMore(key) {
+  showMore[key] = !showMore[key];
+  try { localStorage.setItem(SHOW_MORE_KEY, JSON.stringify(showMore)); } catch {}
+  renderGrid(`${key}-grid`, key);
+  updateMoreButtons();
+}
+
+// ── Summary ───────────────────────────────────────────────────────────────
+let _prevSel = { who:null, act:[], style:null, color:[] };
+function renderSummary() {
+  const stepNames = { who:'👤 主角', act:'🎯 活動（可多選）', style:'🎨 畫風', color:'🌙 顏色（可多選）' };
+  const summaryList = document.getElementById('summary-list');
+  summaryList.innerHTML = ['who','act','style','color'].map(key => {
+    const items = getSelItems(key);
+    const done = items.length > 0;
+    const label = done ? items.map(x => x.zh).join('、') : '未揀';
+    const prevIds = (isMulti(key) ? (_prevSel[key]||[]) : (_prevSel[key] ? [_prevSel[key]] : [])).map(x => x.id).join(',');
+    const nowIds = items.map(x => x.id).join(',');
+    const wasUpdated = done && prevIds !== nowIds;
+    const flashClass = wasUpdated ? 'summary-row-flash' : '';
+    let imgTag;
+    if (!done) {
+      imgTag = `<div style="width:60px;height:60px;background:#fde68a;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">❓</div>`;
+    } else if (key === 'color') {
+      const css = items.map(x => x.css).filter(Boolean).join(',') || '#fde68a';
+      // show first color swatch; if 2, split
+      if (items.length === 1) {
+        imgTag = `<div style="width:60px;height:60px;border-radius:12px;border:2px solid #fde68a;flex-shrink:0;background:${items[0].css || '#fde68a'}"></div>`;
+      } else {
+        imgTag = `<div style="width:60px;height:60px;border-radius:12px;border:2px solid #fde68a;flex-shrink:0;display:flex;overflow:hidden">
+          <div style="flex:1;background:${items[0].css || '#fde68a'}"></div>
+          <div style="flex:1;background:${items[1].css || '#fde68a'}"></div>
+        </div>`;
+      }
+    } else if (items.length === 1) {
+      imgTag = `<img src="${items[0].img}" style="width:60px;height:60px;object-fit:cover;border-radius:12px;border:2px solid #fde68a;flex-shrink:0">`;
+    } else {
+      imgTag = `<div style="width:60px;height:60px;border-radius:12px;border:2px solid #fde68a;flex-shrink:0;display:flex;overflow:hidden">
+        <img src="${items[0].img}" style="width:50%;height:100%;object-fit:cover">
+        <img src="${items[1].img}" style="width:50%;height:100%;object-fit:cover">
+      </div>`;
+    }
+    return `
+      <div class="flex items-center gap-4 bg-white rounded-2xl p-3 border-2 ${done?'border-orange-200':'border-stone-300'} ${flashClass}" id="sum-${key}">
+        ${imgTag}
+        <div class="flex-1">
+          <div class="text-sm font-bold text-stone-400 uppercase tracking-wide">${stepNames[key]}</div>
+          <div class="text-lg font-extrabold ${done?'text-stone-800':'text-stone-400'}">${label}</div>
+        </div>
+        <button onclick="goToStep('${key}')" class="flex-shrink-0 bg-orange-100 text-orange-700 font-extrabold px-4 py-2 rounded-2xl border-2 border-orange-300 text-sm">
+          ${done?'✏️ 改':'➕ 揀'}
+        </button>
+      </div>`;
+  }).join('');
+  _prevSel = {
+    who: sel.who,
+    act: getSelItems('act').map(x => ({...x})),
+    style: sel.style,
+    color: getSelItems('color').map(x => ({...x}))
+  };
+}
+
+// ── Main render ───────────────────────────────────────────────────────────
+function renderAll() {
+  renderGrid('who-grid', 'who');
+  renderGrid('act-grid', 'act');
+  renderGrid('style-grid', 'style');
+  renderGrid('color-grid', 'color');
+  renderSummary();
+  updateMultiHints();
+  updateMoreButtons();
+  updateResultPanelVisibility();
+  updateImageGenSection();
+
+  document.getElementById('dots').innerHTML = Array.from({length:total}, (_,i)=>`
+    <span class="w-4 h-4 rounded-full transition ${i+1===step?'bg-orange-500':'bg-orange-200'} ${i+1>step?'opacity-40':''}"></span>
+  `).join('');
+  document.getElementById('stepLabel').textContent = `第 ${step} 步 / 共 ${total} 步`;
+  document.querySelectorAll('.step-panel').forEach((el,i)=> el.classList.toggle('active', i+1===step));
+  document.getElementById('prevBtn').classList.toggle('invisible', step===1);
+
+  // Show confirm hint when there's a pending selection in normal mode
+  const showHint = !bigMode && pendingKey !== null && step < 5;
+  document.getElementById('confirmHint').classList.toggle('hidden', !showHint);
+
+  // nextBtn logic
+  const nextWrap = document.getElementById('nextWrap');
+  if (step === 4) {
+    nextWrap.innerHTML = `<button onclick="go(1)" class="bg-orange-500 text-white font-extrabold text-lg px-8 py-4 rounded-3xl shadow-lg">
+      ✅ 確認選擇 <i class="fa-solid fa-arrow-right ml-2"></i>
+    </button>`;
+  } else if (step === 5) {
+    nextWrap.innerHTML = '';
+  } else {
+    nextWrap.innerHTML = `<button onclick="go(1)" class="bg-orange-500 text-white font-extrabold text-lg px-8 py-4 rounded-3xl shadow-lg">
+      下一頁 <i class="fa-solid fa-arrow-right ml-2"></i>
+    </button>`;
+  }
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────
+// Commit pending single-select card when user taps Next / goToStep / generate
+function commitPending() {
+  if (!pendingKey || !pendingId) return false;
+  clearTimeout(_pendingTimer);
+  const k = pendingKey, id = pendingId;
+  const item = getDataList(k).find(x => x.id === id);
+  pendingKey = null;
+  pendingId = null;
+  if (!item) return false;
+  const result = applyPick(k, item);
+  if (result === 'full') {
+    showToast(`最多揀 ${MULTI_MAX} 樣`, 'bg-red-500');
+    return false;
+  }
+  generated = false;
+  return true;
+}
+
+// Scroll next-btn into view if it's below the fold
+function scrollToNextButton() {
+  const el = document.getElementById('nextWrap');
+  if (!el || !el.innerHTML.trim()) return;
+  const rect = el.getBoundingClientRect();
+  if (rect.top > window.innerHeight - 20) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function go(d) {
+  if (d > 0) commitPending(); // 「下一頁 / 確認選擇」= 確認而家張卡
+  const next = step + d;
+  if (next < 1 || next > total) return;
+  step = next;
+  renderAll();
+  updatePrompt();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function goToStep(key) {
+  commitPending();
+  const map = { who:1, act:2, style:3, color:4 };
+  step = map[key] || 1;
+  renderAll();
+  updatePrompt();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Pick logic ────────────────────────────────────────────────────────────
+// Single (who/style): 1st tap → pending (green badge), 2nd tap / Next → confirm
+// Multi (act/color): immediate apply (toggle add/remove), no pending state needed
+function pick(key, id) {
+  const item = getDataList(key).find(x => x.id === id);
+  if (!item) return;
+
+  // Multi-select: immediate apply — no pending state
+  if (isMulti(key)) {
+    doApply(key, item);
+    return;
+  }
+
+  // Single-select: pending flow
+  if (bigMode) {
+    pendingKey = null;
+    pendingId = null;
+    doApply(key, item);
+    autoAdvance(key);
+    return;
+  }
+
+  if (pendingKey === key && pendingId === id) {
+    // Second tap → confirm
+    pendingKey = null;
+    pendingId = null;
+    clearTimeout(_pendingTimer);
+    doApply(key, item);
+    autoAdvance(key);
+  } else {
+    // First tap → show pending badge; auto-clear after 2s so stale state doesn't block
+    clearTimeout(_pendingTimer);
+    pendingKey = key;
+    pendingId = id;
+    _pendingTimer = setTimeout(() => {
+      // Timeout: commit as confirmed (same as Next behavior)
+      const pItem = getDataList(pendingKey).find(x => x.id === pendingId);
+      pendingKey = null;
+      pendingId = null;
+      if (pItem) doApply(key, pItem);
+    }, 2000);
+    renderAll();
+  }
+}
+
+// Shared apply + post-apply feedback
+function doApply(key, item) {
+  const result = applyPick(key, item);
+  if (result === 'full') {
+    showToast(`最多揀 ${MULTI_MAX} 樣`, 'bg-red-500');
+    renderAll();
+    return;
+  }
+  playChime();
+  if (result !== 'removed') speakChoice(item.zh);
+  generated = false;
+  renderAll();
+  updatePrompt();
+  scrollToNextButton();
+}
+
+// Big-mode auto-advance for single-select only
+function autoAdvance(key) {
+  if (bigMode && !isMulti(key) && step < 4) {
+    clearTimeout(window._advTimer);
+    window._advTimer = setTimeout(() => {
+      commitPending();
+      step = step + 1;
+      renderAll();
+      updatePrompt();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 600);
+  }
+}
+
+// ── Tabs & prompt ─────────────────────────────────────────────────────────
+const TAB_ACTIVE = 'px-3 py-1 rounded-xl font-extrabold bg-orange-500 text-white text-sm';
+const TAB_INACTIVE = 'px-3 py-1 rounded-xl font-extrabold bg-white text-stone-500 text-sm';
+const LANG_TAB_KEY = 'midautumn_lang_tab';
+function setTab(t) {
+  if (!['zh','cn','en'].includes(t)) t = 'zh';
+  tab = t;
+  try { localStorage.setItem(LANG_TAB_KEY, t); } catch {}
+  ['Zh','Cn','En'].forEach(suf => {
+    const tag = suf.toLowerCase();
+    const out = document.getElementById('out'+suf);
+    const btn = document.getElementById('tab'+suf);
+    if (out) out.classList.toggle('hidden', t !== tag);
+    if (btn) btn.className = t === tag ? TAB_ACTIVE : TAB_INACTIVE;
+  });
+}
+
+function getStudentName() {
+  const el = document.getElementById('studentName');
+  return (el?.value || '').trim().slice(0, 20);
+}
+function onStudentNameInput() {
+  // live refresh prompt if already has picks / generated
+  if (sel.who || hasSelection('act') || sel.style || hasSelection('color') || generated) updatePrompt();
+}
+
+function updatePrompt() {
+  const who = sel.who, st = sel.style;
+  const actItems = getSelItems('act');
+  const colItems = getSelItems('color');
+  const name = getStudentName();
+  updateResultPanelVisibility();
+  if (!who && !actItems.length && !st && !colItems.length) {
+    document.getElementById('outZh').textContent = '請先撳圖揀主角、活動、畫風、顏色。';
+    document.getElementById('outCn').textContent = '请先点图选主角、活动、画风、颜色。';
+    document.getElementById('outEn').textContent = 'Please pick who / action / style / color first.';
+    return;
+  }
+
+  // Name is optional: only inject when filled
+  let whoZh = who ? `主角係${who.zh}。` : '主角：未揀。';
+  let whoCn = who ? `主角是${who.zhCn || who.zh}。` : '主角：未选。';
+  let whoEn = who ? `Main subject: ${who.en}.` : 'Main subject: not chosen.';
+  if (name && who) {
+    if (who.id === 'me') {
+      whoZh = `主角係學生${name}（我自己）。`;
+      whoCn = `主角是学生${name}（我自己）。`;
+      whoEn = `Main subject: a student character named ${name} (myself).`;
+    } else {
+      whoZh = `主角係${who.zh}，學生名叫${name}。`;
+      whoCn = `主角是${who.zhCn || who.zh}，学生名叫${name}。`;
+      whoEn = `Main subject: ${who.en}, student name ${name}.`;
+    }
+  } else if (name && !who) {
+    whoZh = `學生名叫${name}。主角：未揀。`;
+    whoCn = `学生名叫${name}。主角：未选。`;
+    whoEn = `Student name: ${name}. Main subject: not chosen.`;
+  }
+
+  const actZh = actItems.length ? `佢哋喺度${selLabel('act')}。` : '活動：未揀。';
+  const actCn = actItems.length ? `他们在${selLabelCn('act')}。` : '活动：未选。';
+  const actEn = actItems.length ? `They are ${selLabelEn('act')}.` : 'Action: not chosen.';
+  const colZh = colItems.length ? `顏色係${selLabel('color')}。` : '顏色：未揀。';
+  const colCn = colItems.length ? `颜色是${selLabelCn('color')}。` : '颜色：未选。';
+  const colEn = colItems.length ? `Colors: ${selLabelEn('color')}.` : 'Colors: not chosen.';
+
+  const zh = [
+    '一張開心、容易睇嘅中秋節圖。',
+    whoZh,
+    actZh,
+    st ? `畫風係${st.zh}。` : '畫風：未揀。',
+    colZh,
+    '畫面要大、清楚、溫暖、適合小朋友。',
+    '負面：' + NEG_ZH
+  ].filter(Boolean).join('');
+
+  const cn = [
+    '一张开心、容易看的中秋节图片。',
+    whoCn,
+    actCn,
+    st ? `画风是${st.zhCn || st.zh}。` : '画风：未选。',
+    colCn,
+    '画面要大、清楚、温暖、适合小朋友。',
+    '负面：' + NEG_CN
+  ].filter(Boolean).join('');
+
+  const en = [
+    'A joyful Mid-Autumn Festival scene that is easy to understand.',
+    whoEn,
+    actEn,
+    st ? `Art style: ${st.en}.` : 'Art style: not chosen.',
+    colEn,
+    'Big clear shapes, warm and safe for children, simple composition, centered subject.',
+    'Negative prompt: ' + NEG_EN
+  ].filter(Boolean).join(' ');
+
+  document.getElementById('outZh').textContent = zh;
+  document.getElementById('outCn').textContent = cn;
+  document.getElementById('outEn').textContent = en;
+}
+
+function generatePrompt() {
+  commitPending();
+  renderAll();
+  if (!sel.who || !hasSelection('act') || !sel.style || !hasSelection('color')) {
+    updatePrompt();
+    showToast('未揀齊四項，請繼續揀', 'bg-red-500');
+    return;
+  }
+  generated = true;
+  updatePrompt();
+  playChime();
+  showToast('🌕 提詞已生成！', 'bg-green-500');
+}
+
+// Show the result panel only when (a) all 4 categories picked, or (b) on step 5 (confirm).
+// Hides the "複製提詞" empty-state chrome that distracts SEN students mid-flow.
+function updateResultPanelVisibility() {
+  const allPicked = !!(sel.who && hasSelection('act') && sel.style && hasSelection('color'));
+  const visible = step === 5 || allPicked;
+  const panel = document.getElementById('result-panel');
+  if (panel) panel.classList.toggle('is-hidden', !visible);
+}
+
+function copyPrompt() {
+  const text = tab === 'zh'
+    ? document.getElementById('outZh').textContent
+    : tab === 'cn'
+    ? document.getElementById('outCn').textContent
+    : document.getElementById('outEn').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const t = document.getElementById('toast');
+    t.textContent = '已複製！';
+    t.style.opacity = 1;
+    setTimeout(() => t.style.opacity = 0, 1400);
+  });
+}
+
+// ── Randomize & Reset ─────────────────────────────────────────────────────
+function randomizeAll() {
+  const pickRand = arr => arr[Math.floor(Math.random()*arr.length)];
+  const pickTwo = arr => {
+    const a = pickRand(arr);
+    let b = pickRand(arr);
+    let guard = 0;
+    while (b.id === a.id && guard++ < 8) b = pickRand(arr);
+    return b.id === a.id ? [a] : [a, b];
+  };
+  sel.who = pickRand(data.who);
+  sel.act = pickTwo(data.act);
+  sel.style = pickRand(data.style);
+  sel.color = pickTwo(data.color);
+  pendingKey = null;
+  pendingId = null;
+  generated = true;
+  step = 5;
+  renderAll();
+  updatePrompt();
+  playChime();
+  showToast('🌕 隨機提詞已生成！', 'bg-green-500');
+}
+
+function resetAll() {
+  sel = { who:null, act:[], style:null, color:[] };
+  step = 1;
+  generated = false;
+  pendingKey = null;
+  pendingId = null;
+  clearTimeout(_pendingTimer);
+  const nameEl = document.getElementById('studentName');
+  if (nameEl) nameEl.value = '';
+  window.speechSynthesis?.cancel();
+  resetImageGen();
+  renderAll();
+  updatePrompt();
+}
+
+function toggleBigMode() {
+  bigMode = !bigMode;
+  document.body.classList.toggle('big-mode', bigMode);
+  const btn = document.getElementById('bigModeBtn');
+  btn.classList.toggle('bg-orange-100', bigMode);
+  btn.classList.toggle('border-orange-400', bigMode);
+  btn.classList.toggle('text-orange-700', bigMode);
+  // Clear pending in normal mode when switching
+  if (bigMode) { clearTimeout(_pendingTimer); pendingKey = null; pendingId = null; }
+  renderAll();
+}
+
+// ── Worksheet mode (sprint v1.2.1, feature C) ────────────────────────────
+const WORKSHEET_KEY = 'midautumn_worksheet_mode';
+let worksheetMode = false;
+function toggleWorksheetMode(on) {
+  worksheetMode = !!on;
+  try { localStorage.setItem(WORKSHEET_KEY, worksheetMode ? '1' : '0'); } catch {}
+  document.body.classList.toggle('worksheet-mode', worksheetMode);
+  // Sync the toggle checkbox in case caller wasn't the checkbox itself
+  const cb = document.getElementById('worksheetToggle');
+  if (cb && cb.checked !== worksheetMode) cb.checked = worksheetMode;
+  // Clear pending state when entering worksheet mode to avoid stale selection (F2 guard)
+  if (worksheetMode) { clearTimeout(_pendingTimer); pendingKey = null; pendingId = null; }
+  renderAll();
+  showToast(worksheetMode ? 'Worksheet 模式啟用' : 'Worksheet 模式關閉', worksheetMode ? 'bg-orange-500' : 'bg-stone-500');
+}
+function printWorksheet() {
+  if (!worksheetMode) toggleWorksheetMode(true);
+  setTimeout(() => window.print(), 120); // small delay so CSS applies before print dialog
+}
+
+// ── Image Generation (sprint v1.2.3, feature E) ──────────────────────────
+// OFF by default per user decision. Pollinations.ai (free, no API key, CORS open).
+// All state session-only — no API keys stored anywhere.
+const IMAGE_GEN_KEY = 'midautumn_enable_image_gen';
+let imageGenEnabled = false;
+let imageGenController = null; // AbortController for in-flight requests
+
+function toggleImageGen(on) {
+  imageGenEnabled = !!on;
+  try { localStorage.setItem(IMAGE_GEN_KEY, imageGenEnabled ? '1' : '0'); } catch {}
+  const cb = document.getElementById('imageGenToggle');
+  if (cb && cb.checked !== imageGenEnabled) cb.checked = imageGenEnabled;
+  updateImageGenSection();
+  showToast(imageGenEnabled ? '圖像生成已啟用' : '圖像生成已關閉', imageGenEnabled ? 'bg-purple-500' : 'bg-stone-500');
+}
+
+// Show image-gen UI only when (a) teacher enabled, (b) all 4 picked, (c) panel visible
+function updateImageGenSection() {
+  const allPicked = !!(sel.who && hasSelection('act') && sel.style && hasSelection('color'));
+  const section = document.getElementById('imageGenSection');
+  if (section) section.classList.toggle('hidden', !(imageGenEnabled && allPicked));
+}
+
+function resetImageGen() {
+  if (imageGenController) { try { imageGenController.abort(); } catch {} imageGenController = null; }
+  const ids = ['imageGenStatus', 'imageGenResult', 'imageGenError'];
+  ids.forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+  const img = document.getElementById('generatedImage'); if (img) { img.src = ''; img.alt = ''; }
+  const link = document.getElementById('downloadImageLink'); if (link) link.href = '#';
+  const promptEl = document.getElementById('imageGenPrompt'); if (promptEl) promptEl.textContent = '';
+}
+
+async function generateImage() {
+  const statusEl = document.getElementById('imageGenStatus');
+  const resultEl = document.getElementById('imageGenResult');
+  const errorEl = document.getElementById('imageGenError');
+  const imgEl = document.getElementById('generatedImage');
+  const linkEl = document.getElementById('downloadImageLink');
+  const promptEl = document.getElementById('imageGenPrompt');
+
+  // Get English prompt (Pollinations works best with English)
+  const enText = document.getElementById('outEn').textContent || '';
+  if (!enText || enText.startsWith('Please pick')) {
+    showToast('先生成提詞先生成圖', 'bg-red-500');
+    return;
+  }
+
+  // Abort any in-flight request
+  if (imageGenController) { try { imageGenController.abort(); } catch {} }
+  imageGenController = new AbortController();
+
+  // Reset UI
+  resultEl.classList.add('hidden');
+  errorEl.classList.add('hidden');
+  statusEl.classList.remove('hidden');
+  imgEl.src = '';
+  imgEl.alt = '';
+  linkEl.href = '#';
+  promptEl.textContent = enText;
+
+  // Add Mid-Autumn style suffix for better generation
+  const seed = Math.floor(Math.random() * 100000);
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enText)}?width=512&height=512&seed=${seed}&nologo=true`;
+
+  try {
+    const timeoutMs = 60000;
+    const timeoutId = setTimeout(() => { try { imageGenController.abort(); } catch {} }, timeoutMs);
+    const res = await fetch(url, { signal: imageGenController.signal });
+    clearTimeout(timeoutId);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    if (!blob.type.startsWith('image/')) throw new Error('Not an image');
+    const blobUrl = URL.createObjectURL(blob);
+    imgEl.src = blobUrl;
+    imgEl.alt = enText.slice(0, 100);
+    linkEl.href = blobUrl;
+    linkEl.download = `midautumn-${Date.now()}.jpg`;
+    resultEl.classList.remove('hidden');
+    showToast('🌕 圖像生成完成！', 'bg-purple-500');
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      showToast('已取消', 'bg-stone-500');
+      return;
+    }
+    document.getElementById('imageGenErrorMsg').textContent = e.message || '網絡錯誤，請重試';
+    errorEl.classList.remove('hidden');
+    showToast('生成失敗：' + (e.message || '網絡錯誤'), 'bg-red-500');
+  } finally {
+    statusEl.classList.add('hidden');
+    imageGenController = null;
+  }
+}
+
+// ── Teacher Mode ───────────────────────────────────────────────────────────
+function openTeacherMode() {
+  document.getElementById('teacherModal').classList.add('open');
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinError').classList.add('hidden');
+  document.getElementById('pinGate').classList.remove('hidden');
+  document.getElementById('teacherPanel').classList.add('hidden');
+  renderTeacherPanel();
+  document.getElementById('pinInput').focus();
+}
+function closeTeacherMode() {
+  document.getElementById('teacherModal').classList.remove('open');
+}
+function checkPin() {
+  const stored = localStorage.getItem(PIN_KEY) || DEFAULT_PIN;
+  const input = document.getElementById('pinInput').value.trim();
+  if (input === stored) {
+    document.getElementById('pinGate').classList.add('hidden');
+    document.getElementById('teacherPanel').classList.remove('hidden');
+  } else {
+    document.getElementById('pinError').classList.remove('hidden');
+    document.getElementById('pinInput').value = '';
+  }
+}
+function changePin() {
+  const np = document.getElementById('newPinInput').value.trim();
+  if (np.length !== 4 || !/^\d+$/.test(np)) {
+    showToast('PIN 必須係四位數字', 'bg-red-500');
+    return;
+  }
+  localStorage.setItem(PIN_KEY, np);
+  document.getElementById('newPinInput').value = '';
+  showToast('PIN 已更改', 'bg-green-500');
+}
+
+function renderTeacherPanel() {
+  renderTeacherList('edit-who', data.who, 'who');
+  renderTeacherList('edit-act', data.act, 'act');
+  renderTeacherList('edit-style', data.style, 'style');
+  renderHistory();
+}
+function renderTeacherList(elId, list, key) {
+  const box = document.getElementById(elId);
+  box.innerHTML = list.map((item, i) => `
+    <div class="flex gap-2 items-center">
+      <input type="text" value="${item.zh}"
+        class="flex-1 border-2 border-stone-200 rounded-xl px-3 py-1 text-sm font-semibold focus:border-orange-400 focus:outline-none"
+        data-teach-key="${key}" data-teach-idx="${i}" data-teach-field="zh">
+      <input type="text" value="${item.en}"
+        class="flex-1 border-2 border-stone-200 rounded-xl px-3 py-1 text-sm focus:border-orange-400 focus:outline-none"
+        data-teach-key="${key}" data-teach-idx="${i}" data-teach-field="en">
+      <button onclick="deleteTeacherItem('${key}',${i})" class="text-red-400 hover:text-red-600 font-bold px-2" title="刪除">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>`).join('');
+  box.innerHTML += `
+    <button onclick="addTeacherItem('${key}')" class="text-sm text-orange-600 font-bold mt-1 underline">
+      <i class="fa-solid fa-plus mr-1"></i>新增選項
+    </button>`;
+}
+// Delegate event listeners — no inline onchange, avoids any XSS surface
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (!el.matches('[data-teach-key]')) return;
+  const { teachKey: key, teachIdx: idx, teachField: field } = el.dataset;
+  data[key][Number(idx)][field] = el.value;
+  renderTeacherPanel();
+  renderAll();
+});
+function deleteTeacherItem(key, idx) {
+  if (data[key].length <= 2) { showToast('起碼要有 2 個選項', 'bg-red-500'); return; }
+  data[key].splice(idx, 1);
+  renderTeacherPanel();
+  renderAll();
+}
+function addTeacherItem(key) {
+  const newId = 'custom_' + Date.now();
+  const newZh = key === 'who' ? '新主角' : key === 'act' ? '新活動' : key === 'style' ? '新畫風' : '新顏色';
+  data[key].push({ id: newId, zh: newZh, en: 'new option', img: 'img/who-kids.jpg', css: '' });
+  renderTeacherPanel();
+  renderAll();
+}
+
+// ── History ────────────────────────────────────────────────────────────────
+const HISTORY_KEY = 'midautumn_history';
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+  catch { return []; }
+}
+function saveHistory(arr) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0, 20)));
+}
+function saveToHistory() {
+  if (!sel.who) { showToast('未揀任何選項', 'bg-red-500'); return; }
+  const rec = {
+    ts: new Date().toISOString(),
+    name: getStudentName(),
+    whoId: sel.who.id,
+    whoZh: sel.who.zh,
+    actIds: getSelItems('act').map(x => x.id),
+    actZh: selLabel('act'),
+    styleId: sel.style?.id || null,
+    styleZh: sel.style?.zh || '',
+    colorIds: getSelItems('color').map(x => x.id),
+    colorZh: selLabel('color'),
+    zh: document.getElementById('outZh').textContent,
+    cn: document.getElementById('outCn').textContent,
+    en: document.getElementById('outEn').textContent
+  };
+  const h = getHistory();
+  h.unshift(rec);
+  saveHistory(h);
+  showToast('已儲存到歷史', 'bg-green-500');
+  renderHistory();
+}
+function renderHistory() {
+  const box = document.getElementById('history-list');
+  const h = getHistory();
+  if (!h.length) { box.innerHTML = '<p class="text-stone-400 text-sm">暫時未有任何記錄。</p>'; return; }
+  box.innerHTML = h.map((r, i) => `
+    <div class="bg-stone-50 rounded-xl p-2 text-sm border border-stone-200">
+      <div class="flex justify-between items-start">
+        <div class="font-bold text-stone-600">${new Date(r.ts).toLocaleString('zh-HK')}</div>
+        <button onclick="loadHistory(${i})" class="text-orange-500 font-bold text-xs underline">讀取</button>
+      </div>
+      <div class="text-stone-500 mt-1">${r.name ? r.name + ' · ' : ''}${r.whoZh || r.who || ''}${r.actZh || r.act ? ' · ' + (r.actZh || r.act) : ''}</div>
+    </div>`).join('');
+}
+function loadHistory(idx) {
+  const h = getHistory();
+  const r = h[idx];
+  if (!r) return;
+  // Primary: lookup by stable id; fallback to zh string for legacy records
+  const findById = (arr, id) => id ? arr.find(x => x.id === id) : null;
+  const findByZh = (arr, zh) => zh ? arr.find(x => x.zh === zh) : null;
+  const findMultiIds = (arr, ids) =>
+    (ids || []).map(id => findById(arr, id)).filter(Boolean);
+  const findMultiZh = (arr, label) => {
+    if (!label) return [];
+    return String(label).split('、').map(s => s.trim()).filter(Boolean)
+      .map(zh => findByZh(arr, zh)).filter(Boolean);
+  };
+
+  sel.who = findById(data.who, r.whoId) || findByZh(data.who, r.whoZh) || sel.who;
+  sel.act = r.actIds ? findMultiIds(data.act, r.actIds) : findMultiZh(data.act, r.actZh);
+  sel.style = findById(data.style, r.styleId) || (r.styleZh ? findByZh(data.style, r.styleZh) : null);
+  sel.color = r.colorIds ? findMultiIds(data.color, r.colorIds) : findMultiZh(data.color, r.colorZh);
+  pendingKey = null; pendingId = null;
+  generated = true;
+  step = 5;
+  const nameEl = document.getElementById('studentName');
+  if (nameEl) nameEl.value = r.name || '';
+  renderAll();
+  updatePrompt();
+  closeTeacherMode();
+  showToast('已讀取歷史記錄', 'bg-blue-500');
+}
+function clearHistory() {
+  localStorage.removeItem(HISTORY_KEY);
+  renderHistory();
+  showToast('歷史已清除', 'bg-stone-500');
+}
+
+// ── Toast helper ───────────────────────────────────────────────────────────
+function showToast(msg, color) {
+  const t = document.getElementById('toast');
+  t.className = 'fixed top-20 left-1/2 -translate-x-1/2 text-white font-extrabold px-6 py-3 rounded-full opacity-0 pointer-events-none transition z-50' + (color ? ' ' + color : ' bg-orange-600');
+  t.textContent = msg;
+  t.style.opacity = 1;
+  setTimeout(() => t.style.opacity = 0, 2000);
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+// Restore last-used language tab (memory rule 13 F1: default-state desync guard)
+const savedTab = (() => { try { return localStorage.getItem(LANG_TAB_KEY); } catch { return null; } })();
+if (savedTab && ['zh','cn','en'].includes(savedTab)) setTab(savedTab);
+else setTab('zh'); // explicit default
+// Restore worksheet mode if previously enabled
+const savedWorksheet = (() => { try { return localStorage.getItem(WORKSHEET_KEY); } catch { return null; } })();
+if (savedWorksheet === '1') {
+  worksheetMode = true;
+  document.body.classList.add('worksheet-mode');
+}
+// Restore "show more" toggles per category
+try {
+  const saved = JSON.parse(localStorage.getItem(SHOW_MORE_KEY) || '{}');
+  ['who','act','style','color'].forEach(k => { if (saved[k]) showMore[k] = true; });
+} catch {}
+// Restore image generation toggle (sprint v1.2.3 — default OFF)
+try {
+  const savedImg = localStorage.getItem(IMAGE_GEN_KEY);
+  if (savedImg === '1') {
+    imageGenEnabled = true;
+    const cb = document.getElementById('imageGenToggle');
+    if (cb) cb.checked = true;
+  }
+} catch {}
+renderAll();
+
+/* ===== v1.4.2 Theme switcher logic ===== */
+(function() {
+  'use strict';
+  var SELECTED_KEY = 'selected_holiday';
+  var DEFAULT_HOLIDAY = 'mid-autumn';
+  var THEMES = {
+    'mid-autumn': {
+      label: '中秋節',
+      icon: '🌕',
+      navTitle: '中秋畫畫提詞器',
+      ready: true,
+      comingSoonMsg: ''
+    },
+    'spring-festival': {
+      label: '春節',
+      icon: '🧧',
+      navTitle: '春節畫畫提詞器',
+      ready: false,
+      comingSoonMsg: '春節畫畫提詞器仲未 ready,等緊 v1.4.3 — 2026 年底前推出！'
+    },
+    'christmas': {
+      label: '聖誕節',
+      icon: '🎄',
+      navTitle: '聖誕節畫畫提詞器',
+      ready: false,
+      comingSoonMsg: '聖誕節畫畫提詞器仲未 ready,等緊 v1.4.4 — 2026 年底前推出！'
+    },
+    'dragon-boat': {
+      label: '端午節',
+      icon: '🐲',
+      navTitle: '端午節畫畫提詞器',
+      ready: false,
+      comingSoonMsg: '端午節畫畫提詞器仲未 ready,等緊 v1.4.5 — 2026 年底前推出！'
+    }
+  };
+
+  function getSelectedHoliday() {
+    try {
+      var v = localStorage.getItem(SELECTED_KEY);
+      return (v && THEMES[v]) ? v : DEFAULT_HOLIDAY;
+    } catch (e) {
+      return DEFAULT_HOLIDAY;
+    }
+  }
+
+  function setSelectedHoliday(id) {
+    try {
+      if (THEMES[id]) localStorage.setItem(SELECTED_KEY, id);
+    } catch (e) {}
+  }
+
+  function showOverlay(theme) {
+    var overlay = document.getElementById('theme-overlay');
+    if (!overlay) return;
+    document.getElementById('overlay-icon').textContent = theme.icon;
+    document.getElementById('overlay-label').textContent = theme.label;
+    document.getElementById('overlay-msg').textContent = theme.comingSoonMsg;
+    overlay.classList.add('open');
+  }
+
+  function hideOverlay() {
+    var overlay = document.getElementById('theme-overlay');
+    if (overlay) overlay.classList.remove('open');
+  }
+
+  function setNavTitle(text) {
+    var el = document.getElementById('navTitle');
+    if (el) el.textContent = text;
+  }
+
+  function updateAriaPressed(selectedId) {
+    var btns = document.querySelectorAll('.theme-btn');
+    for (var i = 0; i < btns.length; i++) {
+      var b = btns[i];
+      var id = b.getAttribute('data-theme');
+      b.setAttribute('aria-pressed', id === selectedId ? 'true' : 'false');
+    }
+  }
+
+  function initThemeSwitcher() {
+    var btns = document.querySelectorAll('.theme-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].addEventListener('click', function(e) {
+        var id = e.currentTarget.getAttribute('data-theme');
+        var theme = THEMES[id];
+        if (!theme) return;
+        setSelectedHoliday(id);
+        updateAriaPressed(id);
+        if (theme.ready) {
+          // Mid-autumn: update nav title only (full data already in DOM)
+          setNavTitle(theme.navTitle);
+          hideOverlay();
+        } else {
+          setNavTitle(theme.navTitle);
+          showOverlay(theme);
+        }
+      });
+    }
+
+    // Close overlay on click outside box
+    var overlay = document.getElementById('theme-overlay');
+    if (overlay) {
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) hideOverlay();
+      });
+    }
+
+    // Initial state from localStorage
+    var initial = getSelectedHoliday();
+    var theme = THEMES[initial];
+    updateAriaPressed(initial);
+    if (theme) {
+      setNavTitle(theme.navTitle);
+      if (!theme.ready) showOverlay(theme);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeSwitcher);
+  } else {
+    initThemeSwitcher();
+  }
+})();
+</script>
+
+<!-- Theme overlay (placeholder for non-functional themes) -->
+<div id="theme-overlay" role="dialog" aria-modal="true" aria-labelledby="overlay-label">
+  <div class="overlay-box">
+    <div class="overlay-icon" id="overlay-icon" aria-hidden="true">🧧</div>
+    <h2 id="overlay-label">春節</h2>
+    <p id="overlay-msg">即將推出</p>
+    <button class="overlay-close" type="button" onclick="document.getElementById('theme-overlay').classList.remove('open')">返回中秋</button>
+  </div>
+</div>
+</body>
+</html>
