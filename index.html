@@ -216,14 +216,14 @@
         <span class="status pending">🟡 即將推出</span>
       </button>
 
-      <button class="card disabled" type="button" role="listitem"
+      <button class="card" type="button" role="listitem"
               data-holiday="christmas"
-              aria-label="聖誕節畫畫提詞器 (Christmas) — 即將推出"
-              aria-disabled="true">
+              onclick="window.location.href='holiday-prompt-builder.html?holiday=christmas'"
+              aria-label="聖誕節畫畫提詞器 (Christmas) — 可用">
         <div class="icon" aria-hidden="true">🎄</div>
         <div class="name-zh">聖誕節</div>
         <div class="name-en">Christmas</div>
-        <span class="status pending">🟡 即將推出</span>
+        <span class="status ready">✅ 可用</span>
       </button>
 
       <button class="card disabled" type="button" role="listitem"
@@ -289,6 +289,17 @@
     window.location.href = 'midautumn-prompt-builder.html';
   }
 
+  function navigateToHoliday(id) {
+    setSelectedHoliday(id);
+    if (id === 'mid-autumn') {
+      // Mid-autumn has its own canonical file (v1.2.3 baseline)
+      window.location.href = 'midautumn-prompt-builder.html';
+    } else {
+      // Other ready themes go via mega file with ?holiday=<id>
+      window.location.href = 'holiday-prompt-builder.html?holiday=' + id;
+    }
+  }
+
   function initCards() {
     var cards = document.querySelectorAll('.card');
     for (var i = 0; i < cards.length; i++) {
@@ -297,8 +308,8 @@
 
       card.addEventListener('click', function(e) {
         var id = e.currentTarget.getAttribute('data-holiday');
-        if (id === 'mid-autumn') {
-          navigateToMidAutumn();
+        if (id === 'mid-autumn' || id === 'christmas') {
+          navigateToHoliday(id);
         } else {
           showToast('「' + (e.currentTarget.querySelector('.name-zh').textContent) + '」畫畫提詞器仲未 ready,等緊 v1.4.3 — 2026 年底前推出！');
         }

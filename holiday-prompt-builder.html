@@ -332,7 +332,7 @@
           <button class="theme-btn" type="button" data-theme="spring-festival" aria-pressed="false" aria-label="春節主題" disabled>
             <span aria-hidden="true">🧧</span><span class="sr-only">春節</span>
           </button>
-          <button class="theme-btn" type="button" data-theme="christmas" aria-pressed="false" aria-label="聖誕節主題" disabled>
+          <button class="theme-btn" type="button" data-theme="christmas" aria-pressed="false" aria-label="聖誕節主題">
             <span aria-hidden="true">🎄</span><span class="sr-only">聖誕節</span>
           </button>
           <button class="theme-btn" type="button" data-theme="dragon-boat" aria-pressed="false" aria-label="端午節主題" disabled>
@@ -663,6 +663,48 @@ const NEG_ZH = '唔好恐怖、唔好黑暗、唔好複雜字、唔好模糊、�
 const NEG_CN = '不要恐怖、不要黑暗、不要复杂的字、不要模糊、不要有水印、不要拥挤的小细节';
 const NEG_EN = 'no horror, no dark scary mood, no messy text, no blurry faces, no watermark, no crowded tiny details';
 
+const NEG_CHRISTMAS_ZH = '唔好恐怖、唔好黑暗、唔好複雜字、唔好模糊、唔好有浮水印、唔好有宗教符號（十字架、教堂玻璃）、唔好有唔節日嘅元素';
+const NEG_CHRISTMAS_CN = '不要恐怖、不要黑暗、不要复杂的字、不要模糊、不要有水印、不要拥挤的小细节、不要宗教符号（十字架、教堂玻璃）、不要其他节日元素';
+const NEG_CHRISTMAS_EN = 'no horror, no dark scary mood, no messy text, no blurry faces, no watermark, no crowded tiny details, no religious symbols (no crosses, no stained glass windows), no other holiday elements';
+
+// ── Christmas theme data (v1.4.4 — implemented 2026-10-12) ────────────────
+const christmasData = {
+  who: [
+    { id:'santa', zh:'🎅 聖誕老人', zhCn:'🎅 圣诞老人', en:'a kind Santa Claus with red hat and round belly' },
+    { id:'reindeer', zh:'🦌 麋鹿', zhCn:'🦌 驯鹿', en:'a friendly reindeer with red nose' },
+    { id:'child', zh:'🧒 開心小朋友', zhCn:'🧒 开心小朋友', en:'a cheerful child in cozy winter clothes' },
+    { id:'family', zh:'👨‍👩‍👧‍👦 一家人', zhCn:'👨‍👩‍👧‍👦 一家人', en:'a warm family celebrating together' },
+    { id:'snowman', zh:'⛄ 雪人', zhCn:'⛄ 雪人', en:'a cute snowman with carrot nose and red scarf' },
+    { id:'elf', zh:'🧝 精靈', zhCn:'🧝 小精灵', en:'a happy Christmas elf in green outfit' },
+    { id:'angel', zh:'👼 天使', zhCn:'👼 天使', en:'a gentle Christmas angel with soft wings' }
+  ],
+  act: [
+    { id:'gift', zh:'🎁 收禮物', zhCn:'🎁 收礼物', en:'receiving wrapped Christmas gifts' },
+    { id:'tree', zh:'🎄 佈置聖誕樹', zhCn:'🎄 装饰圣诞树', en:'decorating a tall Christmas tree with ornaments' },
+    { id:'snow', zh:'⛄ 堆雪人', zhCn:'⛄ 堆雪人', en:'building a snowman in fresh white snow' },
+    { id:'carol', zh:'🎵 唱聖誕歌', zhCn:'🎵 唱圣诞歌', en:'singing Christmas carols around a fireplace' },
+    { id:'unwrap', zh:'📦 拆禮物', zhCn:'📦 拆礼物', en:'excitedly opening a beautifully wrapped present' },
+    { id:'cookies', zh:'🍪 烤薑餅', zhCn:'🍪 烤姜饼', en:'baking gingerbread cookies with icing decorations' },
+    { id:'sleep', zh:'🛏️ 等聖誕老人', zhCn:'🛏️ 等圣诞老人', en:'sleeping in a cozy bed waiting for Santa' }
+  ],
+  style: [
+    { id:'nordic', zh:'❄ 北歐童話風', zhCn:'❄ 北欧童话风', en:'Nordic fairy tale illustration, soft palette, whimsical' },
+    { id:'cartoon', zh:'🎀 可愛卡通', zhCn:'🎀 可爱卡通', en:'cute kawaii Christmas cartoon, big faces, simple' },
+    { id:'watercolor', zh:'🎨 復古水彩', zhCn:'🎨 复古水彩', en:'vintage watercolor Christmas art, warm and nostalgic' },
+    { id:'realistic', zh:'❄ 雪景寫實', zhCn:'❄ 雪景写实', en:'realistic snowy Christmas scene, cinematic, warm lights' },
+    { id:'papercut', zh:'✂️ 剪紙風', zhCn:'✂️ 剪纸风', en:'Christmas paper cut folk art, flat colorful shapes' },
+    { id:'cozy', zh:'🏠 溫暖夜景', zhCn:'🏠 温暖夜景', en:'warm cozy Christmas night scene, fireplace glow' }
+  ],
+  color: [
+    { id:'red', zh:'🎅 紅色（聖誕）', zhCn:'🎅 红色（圣诞）', en:'bright festive Christmas red, holly berry red', css:'linear-gradient(135deg,#dc2626,#fbbf24)' },
+    { id:'green', zh:'🎄 綠色（聖誕樹）', zhCn:'🎄 绿色（圣诞树）', en:'deep Christmas tree pine green', css:'linear-gradient(135deg,#15803d,#22c55e)' },
+    { id:'gold', zh:'⭐ 金色（裝飾）', zhCn:'⭐ 金色（装饰）', en:'shimmering gold star, ornament gold', css:'linear-gradient(135deg,#f59e0b,#fde68a)' },
+    { id:'silver', zh:'🔔 銀色（鈴鐺）', zhCn:'🔔 银色（铃铛）', en:'silvery white Christmas bell, soft silver glow', css:'linear-gradient(135deg,#94a3b8,#e2e8f0)' },
+    { id:'white', zh:'❄ 雪白（雪花）', zhCn:'❄ 雪白（雪花）', en:'pure snowy white Christmas wonderland', css:'linear-gradient(135deg,#f8fafc,#cbd5e1)' },
+    { id:'ice', zh:'🧊 冰藍（冬日）', zhCn:'🧊 冰蓝（冬日）', en:'icy blue winter wonderland, frosty cool', css:'linear-gradient(135deg,#0ea5e9,#7dd3fc)' }
+  ]
+};
+
 // ── Theme registry (module level for v1.4.2 actual theme switching) ──────
 const THEMES = {
   'mid-autumn': {
@@ -684,8 +726,14 @@ const THEMES = {
     label: '聖誕節',
     icon: '🎄',
     navTitle: '聖誕節畫畫提詞器',
-    ready: false,
-    comingSoonMsg: '聖誕節畫畫提詞器仲未 ready,等緊 v1.4.4 — 2026 年底前推出！'
+    ready: true,  // ✅ Implemented 2026-10-12 (v1.4.4)
+    comingSoonMsg: '',
+    data: christmasData,
+    negativePrompts: {
+      zh: NEG_CHRISTMAS_ZH,
+      zhCn: NEG_CHRISTMAS_CN,
+      en: NEG_CHRISTMAS_EN
+    }
   },
   'dragon-boat': {
     label: '端午節',
@@ -1192,6 +1240,20 @@ function updatePrompt() {
   const actItems = getSelItems('act');
   const colItems = getSelItems('color');
   const name = getStudentName();
+
+  // v1.4.4: theme-specific negative prompts (Christmas has religious-symbol ban)
+  const themeNeg = (THEMES[currentTheme] && THEMES[currentTheme].negativePrompts) || null;
+  const negZh = themeNeg ? themeNeg.zh : NEG_ZH;
+  const negCn = themeNeg ? themeNeg.zhCn : NEG_CN;
+  const negEn = themeNeg ? themeNeg.en : NEG_EN;
+
+  // v1.4.4: theme-specific opening line
+  const themeOpening = {
+    zh: currentTheme === 'christmas' ? '一張開心、容易睇嘅聖誕節圖。' : '一張開心、容易睇嘅中秋節圖。',
+    zhCn: currentTheme === 'christmas' ? '一张开心、容易看的圣诞节图片。' : '一张开心、容易看的中秋节图片。',
+    en: currentTheme === 'christmas' ? 'A joyful Christmas scene that is easy to understand.' : 'A joyful Mid-Autumn Festival scene that is easy to understand.'
+  };
+
   updateResultPanelVisibility();
   if (!who && !actItems.length && !st && !colItems.length) {
     document.getElementById('outZh').textContent = '請先撳圖揀主角、活動、畫風、顏色。';
@@ -1228,33 +1290,33 @@ function updatePrompt() {
   const colEn = colItems.length ? `Colors: ${selLabelEn('color')}.` : 'Colors: not chosen.';
 
   const zh = [
-    '一張開心、容易睇嘅中秋節圖。',
+    themeOpening.zh,
     whoZh,
     actZh,
     st ? `畫風係${st.zh}。` : '畫風：未揀。',
     colZh,
     '畫面要大、清楚、溫暖、適合小朋友。',
-    '負面：' + NEG_ZH
+    '負面：' + negZh
   ].filter(Boolean).join('');
 
   const cn = [
-    '一张开心、容易看的中秋节图片。',
+    themeOpening.zhCn,
     whoCn,
     actCn,
     st ? `画风是${st.zhCn || st.zh}。` : '画风：未选。',
     colCn,
     '画面要大、清楚、温暖、适合小朋友。',
-    '负面：' + NEG_CN
+    '负面：' + negCn
   ].filter(Boolean).join('');
 
   const en = [
-    'A joyful Mid-Autumn Festival scene that is easy to understand.',
+    themeOpening.en,
     whoEn,
     actEn,
     st ? `Art style: ${st.en}.` : 'Art style: not chosen.',
     colEn,
     'Big clear shapes, warm and safe for children, simple composition, centered subject.',
-    'Negative prompt: ' + NEG_EN
+    'Negative prompt: ' + negEn
   ].filter(Boolean).join(' ');
 
   document.getElementById('outZh').textContent = zh;
@@ -1671,6 +1733,23 @@ renderAll();
   var SELECTED_KEY = 'selected_holiday';
   var DEFAULT_HOLIDAY = 'mid-autumn';
 
+  // v1.4.4: URL query param ?holiday=<id> overrides localStorage for direct nav
+  function getInitialHoliday() {
+    try {
+      var urlParams = new URLSearchParams(window.location.search);
+      var urlHoliday = urlParams.get('holiday');
+      if (urlHoliday && THEMES[urlHoliday] && THEMES[urlHoliday].ready) {
+        return urlHoliday;
+      }
+    } catch (e) {}
+    try {
+      var v = localStorage.getItem(SELECTED_KEY);
+      return (v && THEMES[v] && THEMES[v].ready) ? v : DEFAULT_HOLIDAY;
+    } catch (e) {
+      return DEFAULT_HOLIDAY;
+    }
+  }
+
   function getSelectedHoliday() {
     try {
       var v = localStorage.getItem(SELECTED_KEY);
@@ -1748,13 +1827,19 @@ renderAll();
       });
     }
 
-    // Initial state from localStorage
-    var initial = getSelectedHoliday();
+    // Initial state — URL param overrides localStorage for direct nav
+    var initial = getInitialHoliday();
     var theme = THEMES[initial];
     updateAriaPressed(initial);
     if (theme) {
       setNavTitle(theme.navTitle);
-      if (!theme.ready) showOverlay(theme);
+      if (!theme.ready) {
+        showOverlay(theme);
+      } else if (initial !== currentTheme) {
+        // Switch to ready theme (e.g. Christmas via ?holiday=christmas)
+        currentTheme = initial;
+        if (typeof renderAll === 'function') renderAll();
+      }
     }
   }
 
