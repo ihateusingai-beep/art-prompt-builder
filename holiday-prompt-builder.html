@@ -329,8 +329,8 @@
           <button class="theme-btn" type="button" data-theme="mid-autumn" aria-pressed="true" aria-label="中秋節主題">
             <span aria-hidden="true">🌕</span><span class="sr-only">中秋節</span>
           </button>
-          <button class="theme-btn" type="button" data-theme="spring-festival" aria-pressed="false" aria-label="春節主題" disabled>
-            <span aria-hidden="true">🧧</span><span class="sr-only">春節</span>
+          <button class="theme-btn" type="button" data-theme="spring-festival" aria-pressed="false" aria-label="新年主題" disabled>
+            <span aria-hidden="true">🧧</span><span class="sr-only">新年</span>
           </button>
           <button class="theme-btn" type="button" data-theme="christmas" aria-pressed="false" aria-label="聖誕節主題">
             <span aria-hidden="true">🎄</span><span class="sr-only">聖誕節</span>
@@ -716,11 +716,11 @@ const THEMES = {
     data: data  // Reference to global const above
   },
   'spring-festival': {
-    label: '春節',
+    label: '新年',
     icon: '🧧',
-    navTitle: '春節畫畫提詞器',
+    navTitle: '新年畫畫提詞器',
     ready: false,
-    comingSoonMsg: '春節畫畫提詞器仲未 ready,等緊 v1.4.3 — 2026 年底前推出！'
+    comingSoonMsg: '新年畫畫提詞器仲未 ready,等緊 v1.4.3 — 2026 年底前推出！'
   },
   'christmas': {
     label: '聖誕節',
@@ -1855,7 +1855,7 @@ renderAll();
 <div id="theme-overlay" role="dialog" aria-modal="true" aria-labelledby="overlay-label">
   <div class="overlay-box">
     <div class="overlay-icon" id="overlay-icon" aria-hidden="true">🧧</div>
-    <h2 id="overlay-label">春節</h2>
+    <h2 id="overlay-label">新年</h2>
     <p id="overlay-msg">即將推出</p>
     <button class="overlay-close" type="button" onclick="document.getElementById('theme-overlay').classList.remove('open')">返回中秋</button>
   </div>

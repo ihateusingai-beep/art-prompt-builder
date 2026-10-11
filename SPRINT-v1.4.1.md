@@ -4,7 +4,7 @@
 >
 > **Owner**: kencheng
 > **Sprint ID**: v1.4.1
-> **Sprint scope**: Replace `index.html` meta-refresh with **4-card launcher page** (中秋 functional + 春節/聖誕/端午 "即將推出" placeholders)。Click 中秋 → existing `midautumn-prompt-builder.html`。localStorage `selected_holiday` = `mid-autumn` default。
+> **Sprint scope**: Replace `index.html` meta-refresh with **4-card launcher page** (中秋 functional + 新年/聖誕/端午 "即將推出" placeholders)。Click 中秋 → existing `midautumn-prompt-builder.html`。localStorage `selected_holiday` = `mid-autumn` default。
 >
 > **Defer**: Mega file scaffold + mid-autumn migration + 3 new themes → **Sprint v1.4.2** (after v1.3.4 ships per Q1 = (C))
 >
@@ -35,10 +35,10 @@
 
 In scope:
 - Replace `index.html` (currently meta-refresh to midautumn-prompt-builder.html) with launcher page
-- 4 cards: 中秋 (functional) / 春節 (placeholder) / 聖誕 (placeholder) / 端午 (placeholder)
+- 4 cards: 中秋 (functional) / 新年 (placeholder) / 聖誕 (placeholder) / 端午 (placeholder)
 - localStorage `selected_holiday` default = `mid-autumn`
 - Click 中秋 → goes to existing `midautumn-prompt-builder.html` (no changes)
-- Click 春節/聖誕/端午 → show "即將推出" placeholder card OR fade-in toast
+- Click 新年/聖誕/端午 → show "即將推出" placeholder card OR fade-in toast
 - Style: matches existing app aesthetic (linear-gradient bg, card shadows, font)
 - a11y: ARIA labels, keyboard nav, axe-core 0 violations
 
@@ -46,7 +46,7 @@ Out of scope (defer to v1.4.2):
 - Mega file scaffold (`holiday-prompt-builder.html`)
 - Theme switcher UI inside app
 - Mid-autumn theme block migration
-- 3 new holiday themes (春節/聖誕/端午) data + 22 JPGs per theme
+- 3 new holiday themes (新年/聖誕/端午) data + 22 JPGs per theme
 - Negative prompts per holiday
 - localStorage namespace scoping (`theme.<holiday>.*`)
 
@@ -83,7 +83,7 @@ Per Q1 = (C) Hybrid decision (2026-09-22):
 **Defer matrix** (which sprints wait for v1.3):
 - v1.4.1 Launcher: NOW ✅ (this sprint)
 - v1.4.2 Mega scaffold + mid-autumn migration: ⏸ wait v1.3.4
-- v1.4.3 春節 theme: ⏸ wait v1.4.2
+- v1.4.3 新年 theme: ⏸ wait v1.4.2
 - v1.4.4 聖誕 theme: ⏸ wait v1.4.3
 - v1.4.5 端午 theme: ⏸ wait v1.4.4
 
@@ -122,8 +122,8 @@ Replace current `index.html` (51 lines meta-refresh) with **launcher page** (~20
 - Top: brand title「節日畫畫提詞器」+ tagline
 - Middle: 4-card grid (1-col mobile, 2-col tablet, 4-col desktop)
 - Each card:
-  - Icon (emoji 48px): 🌕 (中秋) / 🧧 (春節) / 🎄 (聖誕) / 🐲 (端午)
-  - Title (zh-HK + en): 「中秋節」 / 「Spring Festival」 etc.
+  - Icon (emoji 48px): 🌕 (中秋) / 🧧 (新年) / 🎄 (聖誕) / 🐲 (端午)
+  - Title (zh-HK + en): 「中秋節」 / 「Lunar New Year」 etc.
   - Description: 1-line 「畀同學一齊揀 5 步畫畫」
   - Status badge: 「✅ 可用」 (中秋) / 「🟡 即將推出」 (others)
   - Click handler: 中秋 → `midautumn-prompt-builder.html`; others → toast "即將推出"
@@ -149,7 +149,7 @@ Replace current `index.html` (51 lines meta-refresh) with **launcher page** (~20
 python3 -m http.server 8765 &
 
 # Curl smoke test
-curl -s "http://localhost:8765/index.html" | grep -E "中秋|春節|聖誕|端午"
+curl -s "http://localhost:8765/index.html" | grep -E "中秋|新年|聖誕|端午"
 # Expect: all 4 holidays found
 
 # axe-core a11y smoke
@@ -166,7 +166,7 @@ git commit --no-verify -m "feat(v1.4): launcher page — 4 holiday cards (中秋
 
 Replaces v1.4.0 meta-refresh redirect with 4-card launcher:
 - 中秋 ✅ clickable → midautumn-prompt-builder.html (existing app)
-- 春節/聖誕/端午 🟡 '即將推出' placeholder (toast feedback)
+- 新年/聖誕/端午 🟡 '即將推出' placeholder (toast feedback)
 - localStorage selected_holiday default = mid-autumn
 - a11y: ARIA labels, keyboard nav, axe-core 0 violations target
 - Style: matches existing app (linear-gradient bg, card shadows, Noto Sans TC)
@@ -192,7 +192,7 @@ Wait for Pages deploy (~6-8 min per pattern)。
 curl -sI -L "https://ihateusingai-beep.github.io/art-prompt-builder/" | head -3
 # Expect: HTTP 200
 
-curl -s "https://ihateusingai-beep.github.io/art-prompt-builder/" | grep -E "中秋|春節|聖誕|端午"
+curl -s "https://ihateusingai-beep.github.io/art-prompt-builder/" | grep -E "中秋|新年|聖誕|端午"
 # Expect: 4 holiday names found
 
 # Verify mid-autumn click works (navigate to canonical)

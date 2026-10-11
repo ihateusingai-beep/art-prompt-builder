@@ -4,7 +4,7 @@
 >
 > 1. Repo rename: `mid-autumn-prompt-builder` → **`art-prompt-builder`** (per `ask_3fc8b6a7a0576ed388186eb0` Other field)
 > 2. Architecture: **1 mega file + theme switcher** (per `ask_3fc8b6a7a0576ed388186eb0`)
-> 3. First 4 holidays: **中秋 + 春節 + 聖誕 + 端午** (HK default, per `ask_3fc8b6a7a0576ed388186eb0`)
+> 3. First 4 holidays: **中秋 + 新年 + 聖誕 + 端午** (HK default, per `ask_3fc8b6a7a0576ed388186eb0`)
 > 4. v1.3 features migration timing: **(A) v1.4.1 mega 拎 v1.2.3 baseline + 拎返 v1.3 features** (per `ask_4e70c640acaea61f440d110f`)
 > 5. Dev branch strategy: **(a) Feature branch `v1.4-multi-holiday`**
 > 6. Old URL behavior: **Meta-refresh redirect** (preserve old URL → new URL)
@@ -28,7 +28,7 @@
 |---|---|---|---|---|
 | **v1.4.0** | Repo rename + Pages URL 重新指向 | 30 min | 🟡 (URL redirect) | — |
 | **v1.4.1** | Launcher (`index.html`) + mega file scaffold + theme switcher + mid-autumn migrate | 3-4 hr | 🟡 | v1.4.0 |
-| **v1.4.2** | 春節 theme (data + 22 JPG + prompts × 3 lang) | 2-3 hr | 🟢 | v1.4.1 |
+| **v1.4.2** | 新年 theme (data + 22 JPG + prompts × 3 lang) | 2-3 hr | 🟢 | v1.4.1 |
 | **v1.4.3** | 聖誕 theme | 2-3 hr | 🟢 | v1.4.1 |
 | **v1.4.4** | 端午 theme | 2-3 hr | 🟢 | v1.4.1 |
 
@@ -90,7 +90,7 @@ What we keep / what we migrate:
 **How**:
 
 **`index.html` (launcher)**:
-- 4 holiday cards: 中秋 / 春節 / 聖誕 / 端午 (按時間排序, 最近節日 first)
+- 4 holiday cards: 中秋 / 新年 / 聖誕 / 端午 (按時間排序, 最近節日 first)
 - Each card: icon (24-48px emoji or SVG) + name (zh-HK + en) + 1-line description
 - Click → navigate to `holiday-prompt-builder.html?holiday=<id>` or set localStorage then navigate
 - 預設排列順序: 中秋 first (現有最大 user base)
@@ -108,7 +108,7 @@ What we keep / what we migrate:
 
 **Acceptance**:
 - Click 中秋 → mid-autumn 主题啟動, vocab + 22 JPG + prompts correct
-- Click 春節 → spring festival 主题啟動 (placeholder during v1.4.1, full data after v1.4.2)
+- Click 新年 → Lunar New Year 主题啟動 (placeholder during v1.4.1, full data after v1.4.2)
 - Theme switcher in mega → instant switch (no page reload)
 - Refresh page → theme choice persisted via localStorage
 
@@ -145,9 +145,9 @@ What we keep / what we migrate:
 
 ---
 
-### D. Spring Festival Theme (春節) (v1.4.2)
+### D. Lunar New Year Theme (新年) (v1.4.2)
 
-**What**: 春節 theme data + 22 JPGs + prompts × 3 lang。
+**What**: 新年 theme data + 22 JPGs + prompts × 3 lang。
 
 **Theme content** (research needed):
 - **who**: 媽媽 / 爸爸 / 小朋友 / 爺爺奶奶 / 舞獅 / 財神 / 全家福
@@ -167,7 +167,7 @@ What we keep / what we migrate:
 **Acceptance**:
 - 22 JPGs generated + pre-loaded
 - Vocab × 3 lang: each item has `zh / zhCn / en` fields
-- Theme switcher: 春節 click → correct data + images render
+- Theme switcher: 新年 click → correct data + images render
 
 **LoC estimate**: ~300 LoC (vocab + images + prompts)
 
@@ -253,7 +253,7 @@ What we keep / what we migrate:
 
 ---
 
-### Sprint v1.4.2 — Spring Festival (2-3 hr, 🟢)
+### Sprint v1.4.2 — Lunar New Year (2-3 hr, 🟢)
 
 **Trigger**: v1.4.1 ship + 7-day field data。
 
@@ -265,7 +265,7 @@ What we keep / what we migrate:
 5. `docs: README v1.4.2 changelog`
 
 **Test gate**:
-- ✅ Click 春節 → correct images + vocab + prompts
+- ✅ Click 新年 → correct images + vocab + prompts
 - ✅ Prompt generation in 3 langs (zh-HK/zh-CN/en)
 - ✅ Negative prompt 內嵌
 - ✅ axe-core: 0 violations
@@ -363,7 +363,7 @@ Ready to start sprint v1.4.0 when:
 
 ## 8. Change Log
 
-- **2026-09-22** v1.4 DRAFT opened。3 decisions locked: repo rename `art-prompt-builder`, 1 mega file + theme switcher, 4 holidays (中秋/春節/聖誕/端午)。6 sprint candidates v1.4.0-4。Per user questionnaire `ask_3fc8b6a7a0576ed388186eb0`。
+- **2026-09-22** v1.4 DRAFT opened。3 decisions locked: repo rename `art-prompt-builder`, 1 mega file + theme switcher, 4 holidays (中秋/新年/聖誕/端午)。6 sprint candidates v1.4.0-4。Per user questionnaire `ask_3fc8b6a7a0576ed388186eb0`。
 - **2026-09-22** SPEC-v1.3.md linkage updated (Next: SPEC-v1.4.md DRAFT).
 - **2026-09-22** v1.4 **FROZEN** — additional 3 decisions locked: (A) v1.4.1 拎 v1.3 features, (a) feature branch `v1.4-multi-holiday`, meta-refresh redirect for old URL. Defaults: 「節日畫畫提詞器」 brand / 中秋 first launcher / top-right theme switcher. Per user questionnaire `ask_4e70c640acaea61f440d110f`.
 - **2026-09-23** Sprint v1.4.0 EXECUTED — repo rename `mid-autumn-prompt-builder` → `art-prompt-builder` ✅ done via `gh repo rename`. New URL live (HTTP 200, 1 min Pages re-provisioning). Old URL returns 404 (GitHub Pages 唔支援 auto-redirect + 90-day lock 阻舊名 reuse; user 可手動通知 bookmark update)。`git tag v1.3-final` + `v1.4-multi-holiday` branch created。Sprint v1.4.0 status: COMPLETE。

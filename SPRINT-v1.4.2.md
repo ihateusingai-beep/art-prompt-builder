@@ -12,7 +12,7 @@
 > **Risk**: 🟡 中 (large refactor, single-file integrity, localStorage namespace)
 > **Feature branch**: `v1.4-multi-holiday` (existing from v1.4.0)
 > **Predecessor**: Sprint v1.4.1 ✅ DONE (launcher 4-card grid)
-> **Successor**: Sprint v1.4.3 (春節 theme data + 22 JPGs)
+> **Successor**: Sprint v1.4.3 (新年 theme data + 22 JPGs)
 
 ---
 
@@ -38,7 +38,7 @@
 
 In scope:
 - New file `holiday-prompt-builder.html` (mega file with theme switcher)
-- 4-theme registry: 中秋 (full data) + 春節/聖誕/端午 (placeholders)
+- 4-theme registry: 中秋 (full data) + 新年/聖誕/端午 (placeholders)
 - Theme switcher UI (top-right corner icon row, 4 buttons)
 - Mid-autumn theme block: copy from `midautumn-prompt-builder.html` (data + 22 JPGs + prompts × 3 lang)
 - localStorage `selected_holiday` (theme id, default `mid-autumn`)
@@ -49,7 +49,7 @@ In scope:
 - Live URL verification
 
 Out of scope (defer to v1.4.3-5):
-- 3 new holiday themes (春節/聖誕/端午) data + 22 JPGs each
+- 3 new holiday themes (新年/聖誕/端午) data + 22 JPGs each
 - v1.3 features integration (image UX / Export / Roster / PIN upgrade)
 - Negative prompts per holiday
 - Image-gen UI in mega file (current mid-autumn has it; needs theme-aware copy)
@@ -160,8 +160,8 @@ Insert into `<body>` after header (top-right corner):
   <button class="theme-btn" data-theme="mid-autumn" aria-label="中秋節主題" aria-pressed="true">
     <span aria-hidden="true">🌕</span><span class="sr-only">中秋節</span>
   </button>
-  <button class="theme-btn" data-theme="spring-festival" aria-label="春節主題" aria-disabled="true" disabled>
-    <span aria-hidden="true">🧧</span><span class="sr-only">春節</span>
+  <button class="theme-btn" data-theme="spring-festival" aria-label="新年主題" aria-disabled="true" disabled>
+    <span aria-hidden="true">🧧</span><span class="sr-only">新年</span>
   </button>
   <button class="theme-btn" data-theme="christmas" aria-label="聖誕節主題" aria-disabled="true" disabled>
     <span aria-hidden="true">🎄</span><span class="sr-only">聖誕節</span>
@@ -198,9 +198,9 @@ const THEMES = {
     bgGradient: 'linear-gradient(180deg, #fffbeb 0%, #fed7aa 100%)'
   },
   'spring-festival': {
-    label: '春節',
+    label: '新年',
     placeholder: true,
-    message: '春節畫畫提詞器仲未 ready，等緊 v1.4.3 — 2026 年底前推出！'
+    message: '新年畫畫提詞器仲未 ready，等緊 v1.4.3 — 2026 年底前推出！'
   },
   // ... christmas, dragon-boat similar
 };
@@ -267,7 +267,7 @@ node /tmp/a11y-check/run-axe.js "$(pwd)/holiday-prompt-builder.html" 2>&1 | tail
 
 # Manual: navigate to localhost:8765/holiday-prompt-builder.html
 # - Click theme switcher → verify mid-autumn theme loads
-# - Click 春節 → verify "coming soon" toast
+# - Click 新年 → verify "coming soon" toast
 # - Tab through cards → verify keyboard nav
 ```
 
@@ -288,7 +288,7 @@ New file holiday-prompt-builder.html (~2000 LoC):
 
 Theme switcher UI (top-right, 4 buttons):
 - 中秋 🌕 ✅ functional (aria-pressed=true default)
-- 春節 🧧 / 聖誕 🎄 / 端午 🐲 🟡 placeholder (disabled)
+- 新年 🧧 / 聖誕 🎄 / 端午 🐲 🟡 placeholder (disabled)
 
 localStorage:
 - selected_holiday: 'mid-autumn' default
@@ -319,7 +319,7 @@ Wait for Pages deploy (~6-8 min per pattern)。
 curl -sI -L "https://ihateusingai-beep.github.io/art-prompt-builder/holiday-prompt-builder.html" | head -3
 # Expect: HTTP 200
 
-curl -s "https://ihateusingai-beep.github.io/art-prompt-builder/holiday-prompt-builder.html" | grep -cE "中秋|春節|聖誕|端午"
+curl -s "https://ihateusingai-beep.github.io/art-prompt-builder/holiday-prompt-builder.html" | grep -cE "中秋|新年|聖誕|端午"
 # Expect: ≥ 4 (theme switcher + vocab)
 
 # Update launcher (index.html) to add holiday-prompt-builder.html as new entry option
@@ -377,7 +377,7 @@ This second commit adds a "🎨 多節日 mega" link from launcher → mega file
 - ✅ Mid-autumn theme loads (vocab + images + prompts)
 - ✅ Theme switcher UI visible (4 buttons)
 - ✅ Click 中秋 → mid-autumn theme re-renders (no error)
-- ✅ Click 春節 → "coming soon" toast
+- ✅ Click 新年 → "coming soon" toast
 - ✅ `selected_holiday` localStorage = `mid-autumn` on first load
 - ✅ Existing `midautumn_*` keys preserved (verify in DevTools)
 - ✅ Mid-autumn app (`midautumn-prompt-builder.html`) unchanged
@@ -403,7 +403,7 @@ This second commit adds a "🎨 多節日 mega" link from launcher → mega file
 
 1. **Q1 (CRITICAL)**: Confirm 51-day F4 mitigation = preserve all `midautumn_*` keys in mega file's mid-autumn theme? (Recommended: yes)
 2. **Q2**: Theme switcher position — top-right corner (current plan) OR 「⚙️ 設定」 dropdown OR 「主題」 tab?
-3. **Q3**: When user clicks 春節/聖誕/端午 — show toast (current plan) OR navigate to placeholder page OR disable button (current)?
+3. **Q3**: When user clicks 新年/聖誕/端午 — show toast (current plan) OR navigate to placeholder page OR disable button (current)?
 4. **Q4**: Mid-autumn data migration depth — copy vocab + images + prompts (current plan) OR include 老師 mode + image-gen + worksheet (v1.2.3 full baseline)?
 5. **Q5**: `selected_holiday` localStorage default — `mid-autumn` (current plan) OR `null` (force user pick on first visit)?
 
@@ -418,7 +418,7 @@ This second commit adds a "🎨 多節日 mega" link from launcher → mega file
 ## 12. References
 
 - [SPEC-v1.4.md §2 B — Launcher + Theme Switcher](../SPEC-v1.4.md) (this is in app, not launcher — launcher is index.html)
-- [SPEC-v1.4.md §3 Sprint v1.4.2 — Mega scaffold + Mid-autumn migration](../SPEC-v1.4.md#sprint-v142--spring-festival-2-3-hr-) (Spring Festival reference, mega scaffold scope expanded)
+- [SPEC-v1.4.md §3 Sprint v1.4.2 — Mega scaffold + Mid-autumn migration](../SPEC-v1.4.md#sprint-v142--lunar-new-year-2-3-hr-) (Lunar New Year reference, mega scaffold scope expanded)
 - [SPRINT-v1.4.1.md](./SPRINT-v1.4.1.md) — launcher plan doc (defer matrix)
 - [midautumn-prompt-builder.html](./midautumn-prompt-builder.html) — data source for migration
 - Memory rule 5: >500 LoC → 1.5x budget (mega file expected ~2000 LoC)

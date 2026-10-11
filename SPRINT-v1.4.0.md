@@ -165,7 +165,7 @@ Create `redirect.html` (51 lines similar to current `index.html`):
 <body>
   <div class="container">
     <h1>🌕 中秋節畫畫提詞器 已搬家</h1>
-    <p>本工具已升級為<strong>多節日畫畫提詞器</strong>(中秋 + 春節 + 聖誕 + 端午)，新地址：</p>
+    <p>本工具已升級為<strong>多節日畫畫提詞器</strong>(中秋 + 新年 + 聖誕 + 端午)，新地址：</p>
     <p><a href="https://ihateusingai-beep.github.io/art-prompt-builder/">art-prompt-builder ↗</a></p>
     <p class="small">如果 3 秒後未自動跳轉，請撳上面按鈕。<br>舊 mid-autumn-prompt-builder URL 已永久 redirect。</p>
   </div>
