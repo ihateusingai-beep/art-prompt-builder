@@ -599,6 +599,13 @@
   </div>
 
 <script>
+// ── Theme state (v1.4.2 refactor for actual theme switching) ─────────────
+let currentTheme = 'mid-autumn';
+function getCurrentData() {
+  const t = THEMES[currentTheme];
+  return (t && t.ready && t.data) ? t.data : THEMES['mid-autumn'].data;
+}
+
 // ── Data ──────────────────────────────────────────────────────────────────
 const data = {
   who: [
@@ -646,6 +653,39 @@ const data = {
 const NEG_ZH = '唔好恐怖、唔好黑暗、唔好複雜字、唔好模糊、唔好有浮水印';
 const NEG_CN = '不要恐怖、不要黑暗、不要复杂的字、不要模糊、不要有水印、不要拥挤的小细节';
 const NEG_EN = 'no horror, no dark scary mood, no messy text, no blurry faces, no watermark, no crowded tiny details';
+
+// ── Theme registry (module level for v1.4.2 actual theme switching) ──────
+const THEMES = {
+  'mid-autumn': {
+    label: '中秋節',
+    icon: '🌕',
+    navTitle: '中秋畫畫提詞器',
+    ready: true,
+    comingSoonMsg: '',
+    data: data  // Reference to global const above
+  },
+  'spring-festival': {
+    label: '春節',
+    icon: '🧧',
+    navTitle: '春節畫畫提詞器',
+    ready: false,
+    comingSoonMsg: '春節畫畫提詞器仲未 ready,等緊 v1.4.3 — 2026 年底前推出！'
+  },
+  'christmas': {
+    label: '聖誕節',
+    icon: '🎄',
+    navTitle: '聖誕節畫畫提詞器',
+    ready: false,
+    comingSoonMsg: '聖誕節畫畫提詞器仲未 ready,等緊 v1.4.4 — 2026 年底前推出！'
+  },
+  'dragon-boat': {
+    label: '端午節',
+    icon: '🐲',
+    navTitle: '端午節畫畫提詞器',
+    ready: false,
+    comingSoonMsg: '端午節畫畫提詞器仲未 ready,等緊 v1.4.5 — 2026 年底前推出！'
+  }
+};
 
 const DEFAULT_PIN = '7444';
 const PIN_KEY = 'midautumn_pin';
@@ -767,7 +807,7 @@ document.addEventListener('keydown', e => {
 });
 
 // ── Render helpers ────────────────────────────────────────────────────────
-const getDataList = key => data[key] || [];
+const getDataList = key => getCurrentData()[key] || [];
 function isMulti(key) { return !!MULTI_KEYS[key]; }
 function getSelItems(key) {
   if (isMulti(key)) return Array.isArray(sel[key]) ? sel[key] : [];
@@ -1260,10 +1300,11 @@ function randomizeAll() {
     while (b.id === a.id && guard++ < 8) b = pickRand(arr);
     return b.id === a.id ? [a] : [a, b];
   };
-  sel.who = pickRand(data.who);
-  sel.act = pickTwo(data.act);
-  sel.style = pickRand(data.style);
-  sel.color = pickTwo(data.color);
+  const d = getCurrentData();
+  sel.who = pickRand(d.who);
+  sel.act = pickTwo(d.act);
+  sel.style = pickRand(d.style);
+  sel.color = pickTwo(d.color);
   pendingKey = null;
   pendingId = null;
   generated = true;
@@ -1450,9 +1491,10 @@ function changePin() {
 }
 
 function renderTeacherPanel() {
-  renderTeacherList('edit-who', data.who, 'who');
-  renderTeacherList('edit-act', data.act, 'act');
-  renderTeacherList('edit-style', data.style, 'style');
+  const td = getCurrentData();
+  renderTeacherList('edit-who', td.who, 'who');
+  renderTeacherList('edit-act', td.act, 'act');
+  renderTeacherList('edit-style', td.style, 'style');
   renderHistory();
 }
 function renderTeacherList(elId, list, key) {
@@ -1479,20 +1521,20 @@ document.addEventListener('change', e => {
   const el = e.target;
   if (!el.matches('[data-teach-key]')) return;
   const { teachKey: key, teachIdx: idx, teachField: field } = el.dataset;
-  data[key][Number(idx)][field] = el.value;
+  getCurrentData()[key][Number(idx)][field] = el.value;
   renderTeacherPanel();
   renderAll();
 });
 function deleteTeacherItem(key, idx) {
-  if (data[key].length <= 2) { showToast('起碼要有 2 個選項', 'bg-red-500'); return; }
-  data[key].splice(idx, 1);
+  if (getCurrentData()[key].length <= 2) { showToast('起碼要有 2 個選項', 'bg-red-500'); return; }
+  getCurrentData()[key].splice(idx, 1);
   renderTeacherPanel();
   renderAll();
 }
 function addTeacherItem(key) {
   const newId = 'custom_' + Date.now();
   const newZh = key === 'who' ? '新主角' : key === 'act' ? '新活動' : key === 'style' ? '新畫風' : '新顏色';
-  data[key].push({ id: newId, zh: newZh, en: 'new option', img: 'img/who-kids.jpg', css: '' });
+  getCurrentData()[key].push({ id: newId, zh: newZh, en: 'new option', img: 'img/who-kids.jpg', css: '' });
   renderTeacherPanel();
   renderAll();
 }
@@ -1557,10 +1599,11 @@ function loadHistory(idx) {
       .map(zh => findByZh(arr, zh)).filter(Boolean);
   };
 
-  sel.who = findById(data.who, r.whoId) || findByZh(data.who, r.whoZh) || sel.who;
-  sel.act = r.actIds ? findMultiIds(data.act, r.actIds) : findMultiZh(data.act, r.actZh);
-  sel.style = findById(data.style, r.styleId) || (r.styleZh ? findByZh(data.style, r.styleZh) : null);
-  sel.color = r.colorIds ? findMultiIds(data.color, r.colorIds) : findMultiZh(data.color, r.colorZh);
+  const hd = getCurrentData();
+  sel.who = findById(hd.who, r.whoId) || findByZh(hd.who, r.whoZh) || sel.who;
+  sel.act = r.actIds ? findMultiIds(hd.act, r.actIds) : findMultiZh(hd.act, r.actZh);
+  sel.style = findById(hd.style, r.styleId) || (r.styleZh ? findByZh(hd.style, r.styleZh) : null);
+  sel.color = r.colorIds ? findMultiIds(hd.color, r.colorIds) : findMultiZh(hd.color, r.colorZh);
   pendingKey = null; pendingId = null;
   generated = true;
   step = 5;
@@ -1618,36 +1661,6 @@ renderAll();
   'use strict';
   var SELECTED_KEY = 'selected_holiday';
   var DEFAULT_HOLIDAY = 'mid-autumn';
-  var THEMES = {
-    'mid-autumn': {
-      label: '中秋節',
-      icon: '🌕',
-      navTitle: '中秋畫畫提詞器',
-      ready: true,
-      comingSoonMsg: ''
-    },
-    'spring-festival': {
-      label: '春節',
-      icon: '🧧',
-      navTitle: '春節畫畫提詞器',
-      ready: false,
-      comingSoonMsg: '春節畫畫提詞器仲未 ready,等緊 v1.4.3 — 2026 年底前推出！'
-    },
-    'christmas': {
-      label: '聖誕節',
-      icon: '🎄',
-      navTitle: '聖誕節畫畫提詞器',
-      ready: false,
-      comingSoonMsg: '聖誕節畫畫提詞器仲未 ready,等緊 v1.4.4 — 2026 年底前推出！'
-    },
-    'dragon-boat': {
-      label: '端午節',
-      icon: '🐲',
-      navTitle: '端午節畫畫提詞器',
-      ready: false,
-      comingSoonMsg: '端午節畫畫提詞器仲未 ready,等緊 v1.4.5 — 2026 年底前推出！'
-    }
-  };
 
   function getSelectedHoliday() {
     try {
@@ -1702,10 +1715,16 @@ renderAll();
         setSelectedHoliday(id);
         updateAriaPressed(id);
         if (theme.ready) {
-          // Mid-autumn: update nav title only (full data already in DOM)
+          // Mid-autumn: switch to mid-autumn theme (already default)
+          if (id !== currentTheme) {
+            currentTheme = id;
+            renderAll();   // Re-render wizard with theme data
+          }
           setNavTitle(theme.navTitle);
           hideOverlay();
         } else {
+          // Non-ready theme: show overlay, don't switch actual data
+          currentTheme = 'mid-autumn';  // fallback to mid-autumn data
           setNavTitle(theme.navTitle);
           showOverlay(theme);
         }
