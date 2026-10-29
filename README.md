@@ -2,7 +2,10 @@
 
 > 給同學一起揀 — 中度智障程度嘅學生用大圖卡揀主角、活動、畫風、顏色，自動砌出**中文 + 英文** AI 圖像提詞，老師複製去 Midjourney / DALL·E / 即夢就用得。
 
-一個 zero-backend 嘅 single-file HTML app — 淨係一個 `midautumn-prompt-builder.html`，配 22 張預載 JPG。所有 state 喺 localStorage，可離線用。
+一個 zero-backend 嘅 single-file HTML app — 主檔 `holiday-prompt-builder.html`（四節日），配預載 JPG。所有 state 喺 localStorage，可離線用。
+
+**圖卡風格 canon（統一出圖）→ [`IMAGE-STYLE.md`](./IMAGE-STYLE.md)**  
+兒童圖卡 · 單主體 · soft pastel · **畫面無字** · 1024² JPG。補圖／重產必跟。
 
 ---
 
