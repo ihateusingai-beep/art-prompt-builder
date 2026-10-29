@@ -558,6 +558,23 @@
             <div id="history-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
             <button onclick="clearHistory()" class="mt-2 text-sm text-red-500 font-bold underline">清除全部歷史</button>
           </div>
+          <!-- Prompt Export (v1.3.2) -->
+          <div class="border-t-2 border-stone-200 pt-4">
+            <h3 class="font-extrabold text-stone-700 mb-2">📥 提詞 Export</h3>
+            <p class="text-sm text-stone-500 mb-3">匯出歷史（含當前結果，如有）。空歷史會停用。</p>
+            <div class="grid grid-cols-1 gap-2">
+              <button type="button" id="exportTxtBtn" onclick="exportHistoryTxt()" class="w-full bg-sky-500 text-white font-extrabold px-4 py-3 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-file-lines mr-1"></i>下載 TXT
+              </button>
+              <button type="button" id="exportRichBtn" onclick="exportHistoryRich()" class="w-full bg-indigo-500 text-white font-extrabold px-4 py-3 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-copy mr-1"></i>複製到 Google Doc（富文本）
+              </button>
+              <button type="button" id="exportPdfBtn" onclick="exportHistoryPrintPdf()" class="w-full bg-rose-500 text-white font-extrabold px-4 py-3 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-file-pdf mr-1"></i>列印 / 存 PDF
+              </button>
+            </div>
+            <p id="exportCountHint" class="text-xs text-stone-400 mt-2">0 條可匯出</p>
+          </div>
           <!-- Change PIN -->
           <div class="border-t-2 border-stone-200 pt-4">
             <h3 class="font-extrabold text-stone-700 mb-2">🔑 更改 PIN</h3>
@@ -1661,6 +1678,8 @@ function checkPin() {
   if (input === stored) {
     document.getElementById('pinGate').classList.add('hidden');
     document.getElementById('teacherPanel').classList.remove('hidden');
+    renderTeacherPanel();
+    updateExportButtons();
   } else {
     document.getElementById('pinError').classList.remove('hidden');
     document.getElementById('pinInput').value = '';
@@ -1758,18 +1777,192 @@ function saveToHistory() {
   showToast('已儲存到歷史', 'bg-green-500');
   renderHistory();
 }
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function getExportRecords() {
+  const h = getHistory().slice();
+  // Prepend current result if prompts look generated
+  const zh = (document.getElementById('outZh') || {}).textContent || '';
+  const cn = (document.getElementById('outCn') || {}).textContent || '';
+  const en = (document.getElementById('outEn') || {}).textContent || '';
+  const looksReady = zh.length > 20 && !zh.includes('請先');
+  if (looksReady) {
+    h.unshift({
+      ts: new Date().toISOString(),
+      name: (typeof getStudentName === 'function' ? getStudentName() : '') || '',
+      whoZh: sel.who ? sel.who.zh : '',
+      actZh: typeof selLabel === 'function' ? selLabel('act') : '',
+      styleZh: sel.style ? sel.style.zh : '',
+      colorZh: typeof selLabel === 'function' ? selLabel('color') : '',
+      zh, cn, en,
+      _current: true
+    });
+  }
+  return h;
+}
+
+function updateExportButtons() {
+  const n = getExportRecords().length;
+  const hint = document.getElementById('exportCountHint');
+  if (hint) hint.textContent = n ? (n + ' 條可匯出') : '0 條可匯出（請先生成並可選儲存）';
+  ['exportTxtBtn', 'exportRichBtn', 'exportPdfBtn'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.disabled = n === 0;
+  });
+}
+
+function formatRecordTxt(r, i) {
+  const when = r.ts ? new Date(r.ts).toLocaleString('zh-HK') : '';
+  const tag = r._current ? '[當前]' : ('#' + (i + 1));
+  const name = r.name || '（未填名）';
+  const picks = [r.whoZh || r.who, r.actZh || r.act, r.styleZh || r.style, r.colorZh || r.color].filter(Boolean).join(' · ');
+  return [
+    '======== ' + tag + ' ========',
+    '時間: ' + when,
+    '學生: ' + name,
+    '選擇: ' + picks,
+    '',
+    '【繁中】',
+    r.zh || r.cn || '',
+    '',
+    '【简中】',
+    r.cn || '',
+    '',
+    '【English】',
+    r.en || '',
+    ''
+  ].join('\n');
+}
+
+function exportHistoryTxt() {
+  const recs = getExportRecords();
+  if (!recs.length) { showToast('冇記錄可匯出', 'bg-red-500'); updateExportButtons(); return; }
+  const themeLabel = (THEMES[currentTheme] && THEMES[currentTheme].label) || '節日';
+  const header = '將軍澳培智學校 · ' + themeLabel + '畫畫提詞 Export\n匯出時間: ' + new Date().toLocaleString('zh-HK') + '\n共 ' + recs.length + ' 條\n\n';
+  const body = recs.map((r, i) => formatRecordTxt(r, i)).join('\n');
+  const blob = new Blob([header + body], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  const d = new Date();
+  const ymd = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'art-prompts-' + (currentTheme || 'holiday') + '-' + ymd + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  showToast('已下載 TXT（' + recs.length + ' 條）', 'bg-green-500');
+}
+
+function exportHistoryRich() {
+  const recs = getExportRecords();
+  if (!recs.length) { showToast('冇記錄可匯出', 'bg-red-500'); updateExportButtons(); return; }
+  const themeLabel = (THEMES[currentTheme] && THEMES[currentTheme].label) || '節日';
+  const plain = recs.map((r, i) => formatRecordTxt(r, i)).join('\n\n');
+  const htmlParts = recs.map((r, i) => {
+    const when = r.ts ? new Date(r.ts).toLocaleString('zh-HK') : '';
+    const tag = r._current ? '當前' : ('#' + (i + 1));
+    const name = escapeHtml(r.name || '（未填名）');
+    const picks = escapeHtml([r.whoZh || r.who, r.actZh || r.act, r.styleZh || r.style, r.colorZh || r.color].filter(Boolean).join(' · '));
+    return '<h2>' + escapeHtml(tag) + ' · ' + name + '</h2>'
+      + '<p><b>時間：</b>' + escapeHtml(when) + '<br><b>選擇：</b>' + picks + '</p>'
+      + '<h3>繁中</h3><p>' + escapeHtml(r.zh || '').replace(/\n/g, '<br>') + '</p>'
+      + '<h3>简中</h3><p>' + escapeHtml(r.cn || '').replace(/\n/g, '<br>') + '</p>'
+      + '<h3>English</h3><p>' + escapeHtml(r.en || '').replace(/\n/g, '<br>') + '</p>'
+      + '<hr>';
+  });
+  const rich = '<h1>將軍澳培智學校 · ' + escapeHtml(themeLabel) + '畫畫提詞</h1>'
+    + '<p>匯出時間：' + escapeHtml(new Date().toLocaleString('zh-HK')) + ' · 共 ' + recs.length + ' 條</p>'
+    + htmlParts.join('');
+
+  const doFallback = () => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(plain).then(() => {
+        showToast('已複製純文字（瀏覽器唔支援富文本）', 'bg-green-500');
+      });
+    }
+    showToast('複製失敗', 'bg-red-500');
+    return Promise.resolve();
+  };
+
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([rich], { type: 'text/html' }),
+        'text/plain': new Blob([plain], { type: 'text/plain' })
+      });
+      navigator.clipboard.write([item]).then(() => {
+        showToast('已複製富文本（可 paste 入 Google Doc）', 'bg-green-500');
+      }).catch(() => doFallback());
+    } else {
+      doFallback();
+    }
+  } catch (e) {
+    doFallback();
+  }
+}
+
+function exportHistoryPrintPdf() {
+  const recs = getExportRecords();
+  if (!recs.length) { showToast('冇記錄可匯出', 'bg-red-500'); updateExportButtons(); return; }
+  const themeLabel = (THEMES[currentTheme] && THEMES[currentTheme].label) || '節日';
+  const w = window.open('', '_blank', 'noopener,noreferrer,width=900,height=700');
+  if (!w) { showToast('請允許彈出視窗', 'bg-red-500'); return; }
+  const blocks = recs.map((r, i) => {
+    const when = r.ts ? new Date(r.ts).toLocaleString('zh-HK') : '';
+    const tag = r._current ? '當前' : ('#' + (i + 1));
+    return '<section class="card"><h2>' + escapeHtml(tag) + ' · ' + escapeHtml(r.name || '（未填名）') + '</h2>'
+      + '<p class="meta">時間：' + escapeHtml(when) + '<br>選擇：' + escapeHtml([r.whoZh||r.who,r.actZh||r.act,r.styleZh||r.style,r.colorZh||r.color].filter(Boolean).join(' · ')) + '</p>'
+      + '<h3>繁中</h3><pre>' + escapeHtml(r.zh || '') + '</pre>'
+      + '<h3>简中</h3><pre>' + escapeHtml(r.cn || '') + '</pre>'
+      + '<h3>English</h3><pre>' + escapeHtml(r.en || '') + '</pre></section>';
+  }).join('');
+  w.document.write('<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="UTF-8"><title>Export PDF</title>'
+    + '<style>body{font-family:sans-serif;padding:24px;color:#1c1917}h1{font-size:1.4rem}h2{font-size:1.15rem;margin:0 0 .4rem}.card{border:2px solid #fed7aa;border-radius:12px;padding:16px;margin:0 0 16px;page-break-inside:avoid}pre{white-space:pre-wrap;background:#fff7ed;padding:12px;border-radius:8px;font-size:0.95rem}.meta{color:#78716c;font-size:0.9rem}@media print{button{display:none}}</style></head><body>'
+    + '<button onclick="window.print()" style="margin-bottom:16px;padding:10px 16px;font-weight:800;border-radius:10px;background:#ea580c;color:#fff;border:0;cursor:pointer">列印 / 存 PDF</button>'
+    + '<h1>將軍澳培智學校 · ' + escapeHtml(themeLabel) + '畫畫提詞</h1>'
+    + '<p>匯出時間：' + escapeHtml(new Date().toLocaleString('zh-HK')) + ' · 共 ' + recs.length + ' 條</p>'
+    + blocks + '<script>setTimeout(function(){try{window.print()}catch(e){}},400)<\/script></body></html>');
+  w.document.close();
+  showToast('已開列印預覽（可存 PDF）', 'bg-green-500');
+}
+
+function copyHistoryEntry(idx) {
+  const h = getHistory();
+  const r = h[idx];
+  if (!r) return;
+  const text = formatRecordTxt(r, idx);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast('已複製呢一條', 'bg-green-500'))
+      .catch(() => showToast('複製失敗', 'bg-red-500'));
+  } else {
+    showToast('複製失敗', 'bg-red-500');
+  }
+}
+
 function renderHistory() {
   const box = document.getElementById('history-list');
   const h = getHistory();
-  if (!h.length) { box.innerHTML = '<p class="text-stone-400 text-sm">暫時未有任何記錄。</p>'; return; }
-  box.innerHTML = h.map((r, i) => `
+  if (!h.length) {
+    box.innerHTML = '<p class="text-stone-400 text-sm">暫時未有任何記錄。</p>';
+  } else {
+    box.innerHTML = h.map((r, i) => `
     <div class="bg-stone-50 rounded-xl p-2 text-sm border border-stone-200">
-      <div class="flex justify-between items-start">
+      <div class="flex justify-between items-start gap-2">
         <div class="font-bold text-stone-600">${new Date(r.ts).toLocaleString('zh-HK')}</div>
-        <button onclick="loadHistory(${i})" class="text-orange-500 font-bold text-xs underline">讀取</button>
+        <div class="flex gap-2 shrink-0">
+          <button type="button" onclick="copyHistoryEntry(${i})" class="text-sky-600 font-bold text-xs underline">複製</button>
+          <button type="button" onclick="loadHistory(${i})" class="text-orange-500 font-bold text-xs underline">讀取</button>
+        </div>
       </div>
       <div class="text-stone-500 mt-1">${r.name ? r.name + ' · ' : ''}${r.whoZh || r.who || ''}${r.actZh || r.act ? ' · ' + (r.actZh || r.act) : ''}</div>
     </div>`).join('');
+  }
+  updateExportButtons();
 }
 function loadHistory(idx) {
   const h = getHistory();
@@ -1804,6 +1997,7 @@ function loadHistory(idx) {
 function clearHistory() {
   localStorage.removeItem(HISTORY_KEY);
   renderHistory();
+  updateExportButtons();
   showToast('歷史已清除', 'bg-stone-500');
 }
 
