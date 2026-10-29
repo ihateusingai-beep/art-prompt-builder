@@ -560,17 +560,12 @@
       <!-- Optional student name → affects prompt -->
       <div class="mt-5 p-4 bg-white rounded-3xl border-4 border-amber-200">
         <label for="studentName" class="block text-lg font-extrabold text-stone-700 mb-2">
-          ✏️ 學生名字 <span class="text-stone-400 font-bold text-base">（可選 · 名單優先）</span>
+          ✏️ 學生名字 <span class="text-stone-400 font-bold text-base">（可選）</span>
         </label>
-        <div id="studentNameWrap">
-          <select id="studentNameSelect" class="w-full text-xl font-extrabold border-4 border-orange-200 rounded-2xl px-4 py-3 focus:border-orange-500 focus:outline-none mb-2 hidden" onchange="onStudentSelectChange()">
-            <option value="">— 揀學生 —</option>
-          </select>
-          <input id="studentName" type="text" maxlength="20" autocomplete="off"
-            placeholder="例如：小明（唔填都得）"
-            class="w-full text-xl font-extrabold border-4 border-orange-200 rounded-2xl px-4 py-3 focus:border-orange-500 focus:outline-none"
-            oninput="onStudentNameInput()">
-        </div>
+        <input id="studentName" type="text" maxlength="20" autocomplete="off"
+          placeholder="例如：小明（唔填都得）"
+          class="w-full text-xl font-extrabold border-4 border-orange-200 rounded-2xl px-4 py-3 focus:border-orange-500 focus:outline-none"
+          oninput="onStudentNameInput()">
         <p class="text-sm text-stone-500 mt-2 font-semibold">填咗會寫入提詞；唔填就照常生成。</p>
       </div>
 
@@ -704,19 +699,6 @@
             <div id="history-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
             <button onclick="clearHistory()" class="mt-2 text-sm text-red-500 font-bold underline">清除全部歷史</button>
           </div>
-          <!-- Class Roster (v1.3.3) -->
-          <div class="border-t-2 border-stone-200 pt-4">
-            <h3 class="font-extrabold text-stone-700 mb-2">👥 學生名單</h3>
-            <p class="text-sm text-stone-500 mb-2">最多 10 人。有名單時第 5 步用下拉揀名（SEN 少打字）。</p>
-            <div id="roster-list" class="space-y-2 mb-2 max-h-40 overflow-y-auto"></div>
-            <div class="flex gap-2">
-              <input id="rosterNewName" type="text" maxlength="20" placeholder="新學生名"
-                class="flex-1 border-2 border-stone-300 rounded-xl px-3 py-2 font-bold"
-                onkeydown="if(event.key==='Enter')addRosterName()">
-              <button type="button" onclick="addRosterName()" class="bg-orange-500 text-white font-extrabold px-4 py-2 rounded-xl">加入</button>
-            </div>
-            <button type="button" onclick="importRosterFromHistory()" class="mt-2 text-sm text-sky-600 font-bold underline">由歷史匯入名字</button>
-          </div>
           <!-- Prompt Export (v1.3.2) -->
           <div class="border-t-2 border-stone-200 pt-4">
             <h3 class="font-extrabold text-stone-700 mb-2">📥 提詞 Export</h3>
@@ -803,7 +785,11 @@ const data = {
     { id:'grandparents', zh:'爺爺奶奶', zhCn:'爷爷奶奶', en:'kind grandpa and grandma', img:'img/who-family.jpg' },
     { id:'classmates', zh:'老師同學', zhCn:'老师同学', en:'a friendly teacher with classmates', img:'img/who-kids.jpg' },
     { id:'fairyrabbit', zh:'嫦娥同玉兔', zhCn:'嫦娥和玉兔', en:'Chang-e with the jade rabbit together', img:'img/who-change.jpg' },
-    { id:'friends', zh:'好朋友', zhCn:'好朋友', en:'two happy best friends', img:'img/who-kids.jpg' }
+    { id:'friends', zh:'好朋友', zhCn:'好朋友', en:'two happy best friends', img:'img/who-kids.jpg' },
+    { id:'dog', zh:'小狗', zhCn:'小狗', en:'a cute friendly puppy', img:'img/who-dog.jpg' },
+    { id:'bird', zh:'小鳥', zhCn:'小鸟', en:'a small cheerful bird', img:'img/who-bird.jpg' },
+    { id:'teacher', zh:'老師', zhCn:'老师', en:'a kind smiling teacher', img:'img/who-teacher.jpg' },
+    { id:'bear', zh:'小熊', zhCn:'小熊', en:'a soft cute teddy bear', img:'img/who-bear.jpg' }
   ],
   act: [
     { id:'moon', zh:'🌝 望月亮', zhCn:'🌝 看月亮', en:'looking at a huge round full moon', img:'img/act-moon.jpg' },
@@ -815,7 +801,11 @@ const data = {
     { id:'share', zh:'🍰 分享月餅', zhCn:'🍰 分月饼', en:'happily sharing mooncakes with others', img:'img/act-cake.jpg' },
     { id:'parade', zh:'🚶 提燈遊園', zhCn:'🚶 提灯游园', en:'strolling in a lantern parade in the park', img:'img/act-lantern.jpg' },
     { id:'photo', zh:'📷 團圓影相', zhCn:'📷 团圆拍照', en:'taking a warm family photo under the moon', img:'img/act-garden.jpg' },
-    { id:'candy', zh:'🍬 食糖仔', zhCn:'🍬 吃糖果', en:'enjoying sweet festive candies', img:'img/act-cake.jpg' }
+    { id:'candy', zh:'🍬 食糖仔', zhCn:'🍬 吃糖果', en:'enjoying sweet festive candies', img:'img/act-cake.jpg' },
+    { id:'hug', zh:'擁抱', zhCn:'拥抱', en:'giving a warm gentle hug', img:'img/act-hug.jpg' },
+    { id:'draw', zh:'畫畫', zhCn:'画画', en:'drawing a happy moon picture', img:'img/act-draw.jpg' },
+    { id:'sing', zh:'唱歌', zhCn:'唱歌', en:'singing a happy festival song', img:'img/act-sing.jpg' },
+    { id:'wish', zh:'許願', zhCn:'许愿', en:'making a gentle wish under the moon', img:'img/act-wish.jpg' }
   ],
   style: [
     { id:'cartoon', zh:'😊 可愛卡通', zhCn:'😊 可爱卡通', en:'simple cute cartoon, big faces, thick outlines, easy to understand', img:'img/style-cartoon.jpg' },
@@ -823,7 +813,9 @@ const data = {
     { id:'paper', zh:'✂️ 剪紙畫', zhCn:'✂️ 剪纸画', en:'Chinese paper-cut art, flat colorful shapes, simple patterns', img:'img/style-paper.jpg' },
     { id:'night', zh:'🌙 夜空', zhCn:'🌙 夜空', en:'gentle night scene, glowing lights, not scary', img:'img/style-night.jpg' },
     { id:'simple', zh:'✏️ 簡筆畫', zhCn:'✏️ 简笔画', en:'simple line drawing for kids, clear shapes, minimal detail', img:'img/style-cartoon.jpg' },
-    { id:'softnight', zh:'🌌 溫柔夜景', zhCn:'🌌 温柔夜景', en:'soft gentle night watercolor, warm glow, calm and safe', img:'img/style-night.jpg' }
+    { id:'softnight', zh:'🌌 溫柔夜景', zhCn:'🌌 温柔夜景', en:'soft gentle night watercolor, warm glow, calm and safe', img:'img/style-night.jpg' },
+    { id:'clay', zh:'黏土風', zhCn:'粘土风', en:'soft claymation style, rounded cute shapes', img:'img/style-clay.jpg' },
+    { id:'pastel', zh:'粉彩筆', zhCn:'粉彩笔', en:'oil pastel kids art, soft colorful strokes', img:'img/style-pastel.jpg' }
   ],
   color: [
     { id:'gold', zh:'🌝 金黃（月亮）', zhCn:'🌝 金黄（月亮）', en:'golden yellow moon, warm amber light', css:'linear-gradient(135deg,#f59e0b,#fde68a)', img:'img/color-gold.jpg' },
@@ -852,7 +844,11 @@ const christmasData = {
     { id:'family', zh:'👨‍👩‍👧‍👦 一家人', zhCn:'👨‍👩‍👧‍👦 一家人', en:'a warm family celebrating together', img:'img/christmas/who-family.jpg' },
     { id:'snowman', zh:'⛄ 雪人', zhCn:'⛄ 雪人', en:'a cute snowman with carrot nose and red scarf', img:'img/christmas/who-snowman.jpg' },
     { id:'elf', zh:'🧝 精靈', zhCn:'🧝 小精灵', en:'a happy Christmas elf in green outfit', img:'img/christmas/who-elf.jpg' },
-    { id:'angel', zh:'👼 天使', zhCn:'👼 天使', en:'a gentle Christmas angel with soft wings', img:'img/christmas/who-angel.jpg' }
+    { id:'angel', zh:'👼 天使', zhCn:'👼 天使', en:'a gentle Christmas angel with soft wings', img:'img/christmas/who-angel.jpg' },
+    { id:'penguin', zh:'企鵝', zhCn:'企鹅', en:'a cute penguin with a red scarf', img:'img/christmas/who-penguin.jpg' },
+    { id:'puppy', zh:'小狗', zhCn:'小狗', en:'a fluffy puppy with a Christmas hat', img:'img/christmas/who-puppy.jpg' },
+    { id:'cookie', zh:'薑餅人', zhCn:'姜饼人', en:'a smiling gingerbread person', img:'img/christmas/who-cookie.jpg' },
+    { id:'star', zh:'星星', zhCn:'星星', en:'a friendly glowing Christmas star character', img:'img/christmas/who-star.jpg' }
   ],
   act: [
     { id:'gift', zh:'🎁 收禮物', zhCn:'🎁 收礼物', en:'receiving wrapped Christmas gifts', img:'img/christmas/act-gift.jpg' },
@@ -861,7 +857,11 @@ const christmasData = {
     { id:'carol', zh:'🎵 唱聖誕歌', zhCn:'🎵 唱圣诞歌', en:'singing Christmas carols around a fireplace', img:'img/christmas/act-carol.jpg' },
     { id:'unwrap', zh:'📦 拆禮物', zhCn:'📦 拆礼物', en:'excitedly opening a beautifully wrapped present', img:'img/christmas/act-unwrap.jpg' },
     { id:'cookies', zh:'🍪 烤薑餅', zhCn:'🍪 烤姜饼', en:'baking gingerbread cookies with icing decorations', img:'img/christmas/act-cookies.jpg' },
-    { id:'sleep', zh:'🛏️ 等聖誕老人', zhCn:'🛏️ 等圣诞老人', en:'sleeping in a cozy bed waiting for Santa', img:'img/christmas/act-sleep.jpg' }
+    { id:'sleep', zh:'🛏️ 等聖誕老人', zhCn:'🛏️ 等圣诞老人', en:'sleeping in a cozy bed waiting for Santa', img:'img/christmas/act-sleep.jpg' },
+    { id:'sleigh', zh:'坐雪橇', zhCn:'坐雪橇', en:'riding a fun Christmas sleigh', img:'img/christmas/act-sleigh.jpg' },
+    { id:'hang', zh:'掛襪', zhCn:'挂袜', en:'hanging Christmas stockings by the fireplace', img:'img/christmas/act-hang.jpg' },
+    { id:'skate', zh:'溜冰', zhCn:'溜冰', en:'ice skating happily on a frozen pond', img:'img/christmas/act-skate.jpg' },
+    { id:'hotcocoa', zh:'飲熱可可', zhCn:'喝热可可', en:'drinking warm hot cocoa with marshmallows', img:'img/christmas/act-hotcocoa.jpg' }
   ],
   style: [
     { id:'nordic', zh:'❄ 北歐童話風', zhCn:'❄ 北欧童话风', en:'Nordic fairy tale illustration, soft palette, whimsical', img:'img/christmas/style-nordic.jpg' },
@@ -869,7 +869,9 @@ const christmasData = {
     { id:'watercolor', zh:'🎨 復古水彩', zhCn:'🎨 复古水彩', en:'vintage watercolor Christmas art, warm and nostalgic', img:'img/christmas/style-watercolor.jpg' },
     { id:'realistic', zh:'❄ 雪景寫實', zhCn:'❄ 雪景写实', en:'realistic snowy Christmas scene, cinematic, warm lights', img:'img/christmas/style-realistic.jpg' },
     { id:'papercut', zh:'✂️ 剪紙風', zhCn:'✂️ 剪纸风', en:'Christmas paper cut folk art, flat colorful shapes', img:'img/christmas/style-papercut.jpg' },
-    { id:'cozy', zh:'🏠 溫暖夜景', zhCn:'🏠 温暖夜景', en:'warm cozy Christmas night scene, fireplace glow', img:'img/christmas/style-cozy.jpg' }
+    { id:'cozy', zh:'🏠 溫暖夜景', zhCn:'🏠 温暖夜景', en:'warm cozy Christmas night scene, fireplace glow', img:'img/christmas/style-cozy.jpg' },
+    { id:'felt', zh:'不織布風', zhCn:'不织布风', en:'felt craft Christmas style, soft fabric look', img:'img/christmas/style-felt.jpg' },
+    { id:'sticker', zh:'貼紙風', zhCn:'贴纸风', en:'cute sticker sheet Christmas art, bold simple shapes', img:'img/christmas/style-sticker.jpg' }
   ],
   color: [
     { id:'red', zh:'🎅 紅色（聖誕）', zhCn:'🎅 红色（圣诞）', en:'bright festive Christmas red, holly berry red', css:'linear-gradient(135deg,#dc2626,#fbbf24)' },
@@ -894,7 +896,11 @@ const springFestivalData = {
     { id:'grandparents', zh:'爺爺奶奶', zhCn:'爷爷奶奶', en:'kind grandpa and grandma together', img:'img/spring-festival/who-grandparents.jpg' },
     { id:'lion', zh:'舞獅', zhCn:'舞狮', en:'a colorful friendly Chinese lion dance costume', img:'img/spring-festival/who-lion.jpg' },
     { id:'caishen', zh:'財神', zhCn:'财神', en:'a friendly cheerful Chinese god of wealth with gold ingot', img:'img/spring-festival/who-caishen.jpg' },
-    { id:'family', zh:'全家福', zhCn:'全家福', en:'a warm whole family reunion portrait', img:'img/spring-festival/who-family.jpg' }
+    { id:'family', zh:'全家福', zhCn:'全家福', en:'a warm whole family reunion portrait', img:'img/spring-festival/who-family.jpg' },
+    { id:'dragon', zh:'小龍', zhCn:'小龙', en:'a cute friendly Chinese dragon character', img:'img/spring-festival/who-dragon.jpg' },
+    { id:'ox', zh:'牛牛', zhCn:'牛牛', en:'a cute ox mascot for new year', img:'img/spring-festival/who-ox.jpg' },
+    { id:'baby', zh:'BB', zhCn:'宝宝', en:'a cheerful toddler in red new year clothes', img:'img/spring-festival/who-baby.jpg' },
+    { id:'friend', zh:'好朋友', zhCn:'好朋友', en:'two happy best friends in festive clothes', img:'img/spring-festival/who-friend.jpg' }
   ],
   act: [
     { id:'redpacket', zh:'拎紅包', zhCn:'拿红包', en:'holding bright red envelopes with gold patterns', img:'img/spring-festival/act-redpacket.jpg' },
@@ -903,7 +909,11 @@ const springFestivalData = {
     { id:'visit', zh:'拜年', zhCn:'拜年', en:'paying New Year visits with warm greetings and smiles', img:'img/spring-festival/act-visit.jpg' },
     { id:'niangao', zh:'食年糕', zhCn:'吃年糕', en:'happily eating sweet sticky rice cake', img:'img/spring-festival/act-niangao.jpg' },
     { id:'liondance', zh:'睇舞獅', zhCn:'看舞狮', en:'watching a lively Chinese lion dance performance', img:'img/spring-festival/act-liondance.jpg' },
-    { id:'laissee', zh:'逗利是', zhCn:'收红包', en:'receiving lucky red packets with joy', img:'img/spring-festival/act-laissee.jpg' }
+    { id:'laissee', zh:'逗利是', zhCn:'收红包', en:'receiving lucky red packets with joy', img:'img/spring-festival/act-laissee.jpg' },
+    { id:'lantern', zh:'拎燈籠', zhCn:'提灯笼', en:'holding bright red festival lanterns', img:'img/spring-festival/act-lantern.jpg' },
+    { id:'dumpling', zh:'食餃子', zhCn:'吃饺子', en:'happily eating dumplings together', img:'img/spring-festival/act-dumpling.jpg' },
+    { id:'market', zh:'行年宵', zhCn:'逛年宵', en:'walking through a festive new year market', img:'img/spring-festival/act-market.jpg' },
+    { id:'photo', zh:'影全家福', zhCn:'拍全家福', en:'taking a warm family new year photo', img:'img/spring-festival/act-photo.jpg' }
   ],
   style: [
     { id:'ink', zh:'中國水墨', zhCn:'中国水墨', en:'Chinese ink wash painting, soft brush strokes', img:'img/spring-festival/style-ink.jpg' },
@@ -911,7 +921,9 @@ const springFestivalData = {
     { id:'gongbi', zh:'國畫工筆', zhCn:'国画工笔', en:'fine Chinese gongbi painting, detailed elegant lines', img:'img/spring-festival/style-gongbi.jpg' },
     { id:'cartoon', zh:'卡通可愛', zhCn:'卡通可爱', en:'cute kawaii cartoon, big faces, simple shapes', img:'img/spring-festival/style-cartoon.jpg' },
     { id:'traditional', zh:'傳統年畫', zhCn:'传统年画', en:'traditional Chinese New Year nianhua poster style', img:'img/spring-festival/style-traditional.jpg' },
-    { id:'modern', zh:'現代插畫', zhCn:'现代插画', en:'modern festive illustration, clean bright colors', img:'img/spring-festival/style-modern.jpg' }
+    { id:'modern', zh:'現代插畫', zhCn:'现代插画', en:'modern festive illustration, clean bright colors', img:'img/spring-festival/style-modern.jpg' },
+    { id:'lanternart', zh:'花燈風', zhCn:'花灯风', en:'glowing lantern festival art, warm red gold light', img:'img/spring-festival/style-lanternart.jpg' },
+    { id:'kidsbook', zh:'兒童圖畫書', zhCn:'儿童图画书', en:'children picture book style, soft and clear', img:'img/spring-festival/style-kidsbook.jpg' }
   ],
   color: [
     { id:'red', zh:'紅色（紅包）', zhCn:'红色（红包）', en:'bright festive Chinese red, lucky envelope red', css:'linear-gradient(135deg,#dc2626,#fbbf24)' },
@@ -937,7 +949,11 @@ const dragonBoatData = {
     { id:'grandma', zh:'阿嬤', zhCn:'阿嬷', en:'a kind grandma preparing festival food', img:'img/dragon-boat/who-grandma.jpg' },
     { id:'quyuan', zh:'屈原', zhCn:'屈原', en:'a gentle scholarly ancient poet figure in traditional robes', img:'img/dragon-boat/who-quyuan.jpg' },
     { id:'mugwort', zh:'艾草人偶', zhCn:'艾草人偶', en:'a cute mugwort herb doll charm', img:'img/dragon-boat/who-mugwort.jpg' },
-    { id:'family', zh:'全家', zhCn:'全家', en:'a warm whole family at the dragon boat festival', img:'img/dragon-boat/who-family.jpg' }
+    { id:'family', zh:'全家', zhCn:'全家', en:'a warm whole family at the dragon boat festival', img:'img/dragon-boat/who-family.jpg' },
+    { id:'frog', zh:'青蛙', zhCn:'青蛙', en:'a cute frog by the riverside', img:'img/dragon-boat/who-frog.jpg' },
+    { id:'fish', zh:'小魚', zhCn:'小鱼', en:'a friendly little fish in clear water', img:'img/dragon-boat/who-fish.jpg' },
+    { id:'mom', zh:'媽媽', zhCn:'妈妈', en:'a kind mother at the riverside festival', img:'img/dragon-boat/who-mom.jpg' },
+    { id:'friend', zh:'好朋友', zhCn:'好朋友', en:'two happy friends at dragon boat festival', img:'img/dragon-boat/who-friend.jpg' }
   ],
   act: [
     { id:'paddle', zh:'扒龍舟', zhCn:'划龙舟', en:'paddling a colorful dragon boat on the river', img:'img/dragon-boat/act-paddle.jpg' },
@@ -946,7 +962,11 @@ const dragonBoatData = {
     { id:'bracelet', zh:'戴五彩繩', zhCn:'戴五彩绳', en:'tying a colorful five-thread bracelet on a wrist', img:'img/dragon-boat/act-bracelet.jpg' },
     { id:'boat', zh:'划船', zhCn:'划船', en:'rowing a small boat gently on calm water', img:'img/dragon-boat/act-boat.jpg' },
     { id:'wrap', zh:'包糉子', zhCn:'包粽子', en:'wrapping sticky rice dumplings in bamboo leaves', img:'img/dragon-boat/act-wrap.jpg' },
-    { id:'watch', zh:'睇龍舟', zhCn:'看龙舟', en:'watching a dragon boat race by the riverside', img:'img/dragon-boat/act-watch.jpg' }
+    { id:'watch', zh:'睇龍舟', zhCn:'看龙舟', en:'watching a dragon boat race by the riverside', img:'img/dragon-boat/act-watch.jpg' },
+    { id:'racecheer', zh:'打氣', zhCn:'加油', en:'cheering loudly for the dragon boat team', img:'img/dragon-boat/act-racecheer.jpg' },
+    { id:'picnic', zh:'野餐', zhCn:'野餐', en:'having a simple picnic by the river', img:'img/dragon-boat/act-picnic.jpg' },
+    { id:'drum', zh:'打鼓', zhCn:'打鼓', en:'beating a festival drum happily', img:'img/dragon-boat/act-drum.jpg' },
+    { id:'herbsmell', zh:'聞艾草', zhCn:'闻艾草', en:'smelling fresh green mugwort herbs', img:'img/dragon-boat/act-herbsmell.jpg' }
   ],
   style: [
     { id:'ink', zh:'中國水墨', zhCn:'中国水墨', en:'Chinese ink wash painting, soft river mist brush strokes', img:'img/dragon-boat/style-ink.jpg' },
@@ -954,7 +974,9 @@ const dragonBoatData = {
     { id:'gongbi', zh:'國畫工筆', zhCn:'国画工笔', en:'fine Chinese gongbi painting, detailed elegant lines', img:'img/dragon-boat/style-gongbi.jpg' },
     { id:'folk', zh:'傳統插畫', zhCn:'传统插画', en:'traditional Chinese folk illustration, festive flat colors', img:'img/dragon-boat/style-folk.jpg' },
     { id:'poster', zh:'端午海報', zhCn:'端午海报', en:'bright Dragon Boat Festival poster style, bold shapes', img:'img/dragon-boat/style-poster.jpg' },
-    { id:'classic', zh:'古典風', zhCn:'古典风', en:'classical Chinese riverside scene, calm elegant mood', img:'img/dragon-boat/style-classic.jpg' }
+    { id:'classic', zh:'古典風', zhCn:'古典风', en:'classical Chinese riverside scene, calm elegant mood', img:'img/dragon-boat/style-classic.jpg' },
+    { id:'watercolor', zh:'水彩', zhCn:'水彩', en:'soft watercolor riverside festival scene', img:'img/dragon-boat/style-watercolor.jpg' },
+    { id:'sticker', zh:'貼紙風', zhCn:'贴纸风', en:'cute sticker style dragon boat art', img:'img/dragon-boat/style-sticker.jpg' }
   ],
   color: [
     { id:'green', zh:'綠色（艾草）', zhCn:'绿色（艾草）', en:'fresh mugwort green, leafy festival green', css:'linear-gradient(135deg,#15803d,#86efac)' },
@@ -1238,7 +1260,7 @@ function renderCard(item, key) {
 // ── Render full grids ─────────────────────────────────────────────────────
 // Default visible count per category (rest = "advanced" hidden behind toggle)
 // SEN-friendly: keep only the most concrete / common options on first paint.
-const DEFAULT_COUNTS = { who: 6, act: 6, style: 4, color: 4 };
+const DEFAULT_COUNTS = { who: 9, act: 9, style: 6, color: 6 };
 const SHOW_MORE_KEY = 'midautumn_show_more';
 let showMore = { who: false, act: false, style: false, color: false };
 // Single factory: pass the grid element id + the data key
@@ -1501,11 +1523,7 @@ function setTab(t) {
 }
 
 function getStudentName() {
-  const sel = document.getElementById('studentNameSelect');
   const input = document.getElementById('studentName');
-  if (sel && !sel.classList.contains('hidden') && sel.value && sel.value !== '__other__') {
-    return sel.value.trim();
-  }
   return (input && input.value ? input.value : '').trim();
 }
 function onStudentNameInput() {
@@ -1865,8 +1883,6 @@ function renderTeacherPanel() {
   renderTeacherList('edit-act', td.act, 'act');
   renderTeacherList('edit-style', td.style, 'style');
   renderHistory();
-  renderRoster();
-  refreshStudentNameUI();
 }
 function renderTeacherList(elId, list, key) {
   const box = document.getElementById(elId);
@@ -1913,117 +1929,6 @@ function addTeacherItem(key) {
 // ── History ────────────────────────────────────────────────────────────────
 
 const HISTORY_KEY = 'midautumn_history';
-const ROSTER_KEY = 'midautumn_roster';
-const ROSTER_MAX = 10;
-
-function getRoster() {
-  try {
-    const arr = JSON.parse(localStorage.getItem(ROSTER_KEY) || '[]');
-    return Array.isArray(arr) ? arr.filter(x => x && x.name).slice(0, ROSTER_MAX) : [];
-  } catch (e) { return []; }
-}
-function saveRoster(arr) {
-  localStorage.setItem(ROSTER_KEY, JSON.stringify((arr || []).slice(0, ROSTER_MAX)));
-}
-function addRosterName() {
-  const input = document.getElementById('rosterNewName');
-  const name = (input && input.value || '').trim();
-  if (!name) { showToast('請輸入名字', 'bg-red-500'); return; }
-  const list = getRoster();
-  if (list.some(x => x.name === name)) { showToast('已有呢個名', 'bg-orange-500'); return; }
-  if (list.length >= ROSTER_MAX) { showToast('名單最多 ' + ROSTER_MAX + ' 人', 'bg-red-500'); return; }
-  list.push({ name: name, createdAt: new Date().toISOString() });
-  saveRoster(list);
-  if (input) input.value = '';
-  renderRoster();
-  refreshStudentNameUI();
-  showToast('已加入 ' + name, 'bg-green-500');
-}
-function removeRosterName(idx) {
-  const list = getRoster();
-  if (idx < 0 || idx >= list.length) return;
-  const n = list[idx].name;
-  list.splice(idx, 1);
-  saveRoster(list);
-  renderRoster();
-  refreshStudentNameUI();
-  showToast('已移除 ' + n, 'bg-green-500');
-}
-function importRosterFromHistory() {
-  const list = getRoster();
-  const names = new Set(list.map(x => x.name));
-  let added = 0;
-  getHistory().forEach(r => {
-    const n = (r.name || '').trim();
-    if (!n || names.has(n) || list.length >= ROSTER_MAX) return;
-    list.push({ name: n, createdAt: new Date().toISOString() });
-    names.add(n);
-    added++;
-  });
-  saveRoster(list);
-  renderRoster();
-  refreshStudentNameUI();
-  showToast(added ? ('匯入 ' + added + ' 個名') : '冇新名字可匯入', added ? 'bg-green-500' : 'bg-orange-500');
-}
-function renderRoster() {
-  const box = document.getElementById('roster-list');
-  if (!box) return;
-  const list = getRoster();
-  if (!list.length) {
-    box.innerHTML = '<p class="text-stone-400 text-sm">未有名單 — 可手動加入或由歷史匯入。</p>';
-    return;
-  }
-  box.innerHTML = list.map((x, i) =>
-    '<div class="flex items-center justify-between gap-2 bg-stone-50 border border-stone-200 rounded-xl px-3 py-2">'
-    + '<span class="font-extrabold text-stone-700">' + escapeHtml(x.name) + '</span>'
-    + '<button type="button" class="text-red-500 font-bold text-xs underline" onclick="removeRosterName(' + i + ')">刪除</button>'
-    + '</div>'
-  ).join('');
-}
-function refreshStudentNameUI() {
-  const sel = document.getElementById('studentNameSelect');
-  const input = document.getElementById('studentName');
-  if (!sel || !input) return;
-  const list = getRoster();
-  const cur = input.value.trim();
-  if (list.length) {
-    sel.classList.remove('hidden');
-    const opts = ['<option value="">— 揀學生 —</option>']
-      .concat(list.map(x => '<option value="' + escapeHtml(x.name) + '"' + (x.name === cur ? ' selected' : '') + '>' + escapeHtml(x.name) + '</option>'))
-      .concat(['<option value="__other__">其他（自己填）</option>']);
-    sel.innerHTML = opts.join('');
-    if (cur && list.some(x => x.name === cur)) {
-      sel.value = cur;
-      input.classList.add('hidden');
-    } else if (cur) {
-      sel.value = '__other__';
-      input.classList.remove('hidden');
-    } else {
-      sel.value = '';
-      input.classList.add('hidden');
-    }
-  } else {
-    sel.classList.add('hidden');
-    input.classList.remove('hidden');
-  }
-}
-function onStudentSelectChange() {
-  const sel = document.getElementById('studentNameSelect');
-  const input = document.getElementById('studentName');
-  if (!sel || !input) return;
-  if (sel.value === '__other__') {
-    input.classList.remove('hidden');
-    input.value = '';
-    input.focus();
-  } else if (sel.value === '') {
-    input.value = '';
-    input.classList.add('hidden');
-  } else {
-    input.value = sel.value;
-    input.classList.add('hidden');
-  }
-  if (typeof onStudentNameInput === 'function') onStudentNameInput();
-}
 
 
 function getHistory() {
@@ -2434,7 +2339,6 @@ renderAll();
 
   function bootUI() {
     initThemeSwitcher();
-    if (typeof refreshStudentNameUI === 'function') refreshStudentNameUI();
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bootUI);
