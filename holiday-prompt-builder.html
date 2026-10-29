@@ -335,7 +335,7 @@
           <button class="theme-btn" type="button" data-theme="christmas" aria-pressed="false" aria-label="聖誕節主題">
             <span aria-hidden="true">🎄</span><span class="sr-only">聖誕節</span>
           </button>
-          <button class="theme-btn" type="button" data-theme="dragon-boat" aria-pressed="false" aria-label="端午節主題" disabled>
+          <button class="theme-btn" type="button" data-theme="dragon-boat" aria-pressed="false" aria-label="端午節主題">
             <span aria-hidden="true">🐲</span><span class="sr-only">端午節</span>
           </button>
         </div>
@@ -748,6 +748,49 @@ const springFestivalData = {
 };
 
 
+const NEG_DRAGON_ZH = '唔好恐怖、唔好黑暗、唔好複雜字、唔好模糊、唔好有浮水印、唔好有西方節日元素、唔好有酒醉場面';
+const NEG_DRAGON_CN = '不要恐怖、不要黑暗、不要复杂的字、不要模糊、不要有水印、不要西方节日元素、不要酒醉场面';
+const NEG_DRAGON_EN = 'no horror, no dark scary mood, no messy text, no blurry faces, no watermark, no western holiday elements, no drunk scenes';
+
+// Dragon Boat Festival theme data (v1.4.5 — 2026-10-29)
+const dragonBoatData = {
+  who: [
+    { id:'racer', zh:'龍舟隊員', zhCn:'龙舟队员', en:'friendly dragon boat team paddlers in matching shirts', img:'img/dragon-boat/who-racer.jpg' },
+    { id:'kids', zh:'小朋友', zhCn:'小朋友', en:'cheerful children watching the festival', img:'img/dragon-boat/who-kids.jpg' },
+    { id:'dad', zh:'爸爸', zhCn:'爸爸', en:'a kind father at the riverside festival', img:'img/dragon-boat/who-dad.jpg' },
+    { id:'grandma', zh:'阿嬤', zhCn:'阿嬷', en:'a kind grandma preparing festival food', img:'img/dragon-boat/who-grandma.jpg' },
+    { id:'quyuan', zh:'屈原', zhCn:'屈原', en:'a gentle scholarly ancient poet figure in traditional robes', img:'img/dragon-boat/who-quyuan.jpg' },
+    { id:'mugwort', zh:'艾草人偶', zhCn:'艾草人偶', en:'a cute mugwort herb doll charm', img:'img/dragon-boat/who-mugwort.jpg' },
+    { id:'family', zh:'全家', zhCn:'全家', en:'a warm whole family at the dragon boat festival', img:'img/dragon-boat/who-family.jpg' }
+  ],
+  act: [
+    { id:'paddle', zh:'扒龍舟', zhCn:'划龙舟', en:'paddling a colorful dragon boat on the river', img:'img/dragon-boat/act-paddle.jpg' },
+    { id:'zongzi', zh:'食糉子', zhCn:'吃粽子', en:'happily eating sticky rice dumplings zongzi', img:'img/dragon-boat/act-zongzi.jpg' },
+    { id:'hang', zh:'掛艾草', zhCn:'挂艾草', en:'hanging green mugwort herbs on a door', img:'img/dragon-boat/act-hang.jpg' },
+    { id:'bracelet', zh:'戴五彩繩', zhCn:'戴五彩绳', en:'tying a colorful five-thread bracelet on a wrist', img:'img/dragon-boat/act-bracelet.jpg' },
+    { id:'boat', zh:'划船', zhCn:'划船', en:'rowing a small boat gently on calm water', img:'img/dragon-boat/act-boat.jpg' },
+    { id:'wrap', zh:'包糉子', zhCn:'包粽子', en:'wrapping sticky rice dumplings in bamboo leaves', img:'img/dragon-boat/act-wrap.jpg' },
+    { id:'watch', zh:'睇龍舟', zhCn:'看龙舟', en:'watching a dragon boat race by the riverside', img:'img/dragon-boat/act-watch.jpg' }
+  ],
+  style: [
+    { id:'ink', zh:'中國水墨', zhCn:'中国水墨', en:'Chinese ink wash painting, soft river mist brush strokes', img:'img/dragon-boat/style-ink.jpg' },
+    { id:'cartoon', zh:'卡通可愛', zhCn:'卡通可爱', en:'cute kawaii cartoon, big faces, simple shapes', img:'img/dragon-boat/style-cartoon.jpg' },
+    { id:'gongbi', zh:'國畫工筆', zhCn:'国画工笔', en:'fine Chinese gongbi painting, detailed elegant lines', img:'img/dragon-boat/style-gongbi.jpg' },
+    { id:'folk', zh:'傳統插畫', zhCn:'传统插画', en:'traditional Chinese folk illustration, festive flat colors', img:'img/dragon-boat/style-folk.jpg' },
+    { id:'poster', zh:'端午海報', zhCn:'端午海报', en:'bright Dragon Boat Festival poster style, bold shapes', img:'img/dragon-boat/style-poster.jpg' },
+    { id:'classic', zh:'古典風', zhCn:'古典风', en:'classical Chinese riverside scene, calm elegant mood', img:'img/dragon-boat/style-classic.jpg' }
+  ],
+  color: [
+    { id:'green', zh:'綠色（艾草）', zhCn:'绿色（艾草）', en:'fresh mugwort green, leafy festival green', css:'linear-gradient(135deg,#15803d,#86efac)' },
+    { id:'red', zh:'紅色（綵帶）', zhCn:'红色（彩带）', en:'bright festive red ribbon', css:'linear-gradient(135deg,#dc2626,#fbbf24)' },
+    { id:'yellow', zh:'黃色（糉葉）', zhCn:'黄色（粽叶）', en:'warm bamboo leaf yellow-green', css:'linear-gradient(135deg,#ca8a04,#fde047)' },
+    { id:'purple', zh:'紫色（華麗）', zhCn:'紫色（华丽）', en:'soft festive purple', css:'linear-gradient(135deg,#7c3aed,#c4b5fd)' },
+    { id:'teal', zh:'青色（河水）', zhCn:'青色（河水）', en:'calm river teal blue-green', css:'linear-gradient(135deg,#0f766e,#5eead4)' },
+    { id:'gold', zh:'金色（裝飾）', zhCn:'金色（装饰）', en:'shimmering gold festival trim', css:'linear-gradient(135deg,#f59e0b,#fde68a)' }
+  ]
+};
+
+
 // ── Theme registry (module level for v1.4.2 actual theme switching) ──────
 const THEMES = {
   'mid-autumn': {
@@ -788,8 +831,14 @@ const THEMES = {
     label: '端午節',
     icon: '🐲',
     navTitle: '端午節畫畫提詞器',
-    ready: false,
-    comingSoonMsg: '端午節畫畫提詞器仲未 ready,等緊 v1.4.5 — 2026 年底前推出！'
+    ready: true,
+    comingSoonMsg: '',
+    data: dragonBoatData,
+    negativePrompts: {
+      zh: NEG_DRAGON_ZH,
+      zhCn: NEG_DRAGON_CN,
+      en: NEG_DRAGON_EN
+    }
   }
 };
 
@@ -1312,6 +1361,11 @@ function updatePrompt() {
       zh: '一張開心、容易睇嘅新年圖。',
       zhCn: '一张开心、容易看的新年图片。',
       en: 'A joyful Lunar New Year scene that is easy to understand.'
+    },
+    'dragon-boat': {
+      zh: '一張開心、容易睇嘅端午節圖。',
+      zhCn: '一张开心、容易看的端午节图片。',
+      en: 'A joyful Dragon Boat Festival scene that is easy to understand.'
     }
   };
   const themeOpening = themeOpeningMap[currentTheme] || themeOpeningMap['mid-autumn'];

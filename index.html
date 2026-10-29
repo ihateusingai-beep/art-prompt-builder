@@ -192,7 +192,7 @@
     <div class="school-name-en">Tseung Kwan O Pui Chi School</div>
     <h1>🎨 節日畫畫提詞器</h1>
     <p class="tagline">SEN 老師用嘅多節日 AI 提詞工具 — 同學 5 步揀,AI 即刻出圖</p>
-    <span class="version-badge">v1.4.3 · 多節日 platform</span>
+    <span class="version-badge">v1.4.5 · 多節日 platform</span>
   </header>
 
   <main>
@@ -226,14 +226,14 @@
         <span class="status ready">✅ 可用</span>
       </button>
 
-      <button class="card disabled" type="button" role="listitem"
+      <button class="card" type="button" role="listitem"
               data-holiday="dragon-boat"
-              aria-label="端午節畫畫提詞器 (Dragon Boat Festival) — 即將推出"
-              aria-disabled="true">
+              onclick="window.location.href='holiday-prompt-builder.html?holiday=dragon-boat'"
+              aria-label="端午節畫畫提詞器 (Dragon Boat Festival) — 可用">
         <div class="icon" aria-hidden="true">🐲</div>
         <div class="name-zh">端午節</div>
         <div class="name-en">Dragon Boat Festival</div>
-        <span class="status pending">🟡 即將推出</span>
+        <span class="status ready">✅ 可用</span>
       </button>
     </div>
   </main>
@@ -308,7 +308,7 @@
 
       card.addEventListener('click', function(e) {
         var id = e.currentTarget.getAttribute('data-holiday');
-        if (id === 'mid-autumn' || id === 'christmas' || id === 'spring-festival') {
+        if (id === 'mid-autumn' || id === 'christmas' || id === 'spring-festival' || id === 'dragon-boat') {
           navigateToHoliday(id);
         } else {
           showToast('「' + (e.currentTarget.querySelector('.name-zh').textContent) + '」畫畫提詞器仲未 ready,等緊 v1.4.3 — 2026 年底前推出！');
