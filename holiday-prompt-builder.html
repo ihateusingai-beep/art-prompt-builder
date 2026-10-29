@@ -204,6 +204,143 @@
     #toast.green { background: #16a34a; }
     #toast.blue { background: #2563eb; }
 
+
+    /* SEN no-page-scroll shell (v1.3.3+) */
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      max-height: 100dvh;
+      overflow: hidden;
+      margin: 0;
+    }
+    body.app-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+      max-height: 100dvh;
+    }
+    body.app-shell > header.school-header {
+      flex: 0 0 auto;
+      padding: 0.35rem 0.75rem !important;
+    }
+    body.app-shell > header.school-header img {
+      width: 36px !important;
+      height: 36px !important;
+      margin-bottom: 0.15rem !important;
+    }
+    body.app-shell > header.school-header .school-name-main { font-size: 0.85rem !important; }
+    body.app-shell > header.school-header .school-name-en { display: none !important; }
+    body.app-shell > nav { flex: 0 0 auto; }
+    body.app-shell > #app-main {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding-top: 0.5rem !important;
+      padding-bottom: 0 !important;
+      width: 100%;
+    }
+    body.app-shell .step-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    body.app-shell .step-panel.active {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex !important;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    body.app-shell .step-panel h2 {
+      font-size: 1.35rem !important;
+      margin-bottom: 0.25rem !important;
+    }
+    body.app-shell .step-panel > p {
+      font-size: 0.95rem !important;
+      margin-bottom: 0.35rem !important;
+    }
+    body.app-shell .card-grid {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.45rem !important;
+      align-content: stretch;
+    }
+    @media (max-width: 420px) {
+      body.app-shell .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    body.app-shell .card {
+      min-height: 0 !important;
+      height: 100%;
+      padding: 0.35rem !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    body.app-shell .card img {
+      width: 56px !important;
+      height: 56px !important;
+      border-radius: 12px !important;
+      border-width: 2px !important;
+    }
+    body.app-shell .card .card-text {
+      font-size: 0.95rem !important;
+      line-height: 1.15 !important;
+      margin-top: 0.15rem !important;
+    }
+    body.app-shell .speak-btn {
+      width: 28px !important;
+      height: 28px !important;
+      font-size: 11px !important;
+      top: 3px !important;
+      right: 3px !important;
+    }
+    body.app-shell .confirm-badge {
+      width: 40px !important;
+      height: 40px !important;
+      font-size: 18px !important;
+    }
+    body.app-shell #bottom-nav {
+      flex: 0 0 auto;
+      padding: 0.45rem 0.75rem calc(0.45rem + env(safe-area-inset-bottom));
+      background: rgba(255,251,235,0.96);
+      border-top: 3px solid #fde68a;
+      z-index: 45;
+    }
+    body.app-shell #bottom-nav button {
+      padding: 0.6rem 1.1rem !important;
+      font-size: 1rem !important;
+      border-radius: 1rem !important;
+    }
+    body.app-shell #result-panel {
+      position: fixed !important;
+      left: 50% !important;
+      transform: translateX(-50%);
+      bottom: calc(4.25rem + env(safe-area-inset-bottom)) !important;
+      max-height: 26vh;
+      overflow: auto;
+      z-index: 48;
+    }
+    body.app-shell #result-panel .glass { padding: 0.5rem 0.75rem !important; }
+    body.app-shell #result-panel #outZh,
+    body.app-shell #result-panel #outCn,
+    body.app-shell #result-panel #outEn {
+      min-height: 44px !important;
+      max-height: 12vh;
+      overflow: auto;
+      font-size: 0.9rem !important;
+      padding: 0.45rem !important;
+    }
+    body.app-shell > footer { display: none !important; }
+    body.app-shell.big-mode .card .card-text { font-size: 1.1rem !important; }
+    body.app-shell.big-mode .step-panel h2 { font-size: 1.5rem !important; }
+    body.app-shell.big-mode .card img { width: 64px !important; height: 64px !important; }
+    body.app-shell .modal-box { max-height: 85dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     /* Theme switcher (v1.4.2 mega scaffold) */
     .theme-switcher {
       display: inline-flex;
@@ -308,15 +445,15 @@
     }
   </style>
 </head>
-<body class="min-h-screen" style="background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 50%, #fbcfe8 100%); color: #1e3a8a;">
+<body class="app-shell min-h-screen" style="background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 50%, #fbcfe8 100%); color: #1e3a8a;">
 
 <!-- School header -->
-<header style="text-align: center; padding: 1rem 1.5rem 0.5rem; background: rgba(255,255,255,0.5); backdrop-filter: blur(8px);">
+<header class="school-header" style="text-align: center; padding: 1rem 1.5rem 0.5rem; background: rgba(255,255,255,0.5); backdrop-filter: blur(8px);">
   <img src="https://www.puichi.edu.hk/it-school/php/webcms/files/upload/tinymce//1a__pui_chi_logo_png_1791177564.png"
        alt="將軍澳培智學校校徽"
        style="width:64px; height:64px; border-radius:50%; background:white; padding:3px; box-shadow:0 2px 8px rgba(30,64,175,0.18); margin-bottom:0.5rem;">
-  <div style="font-size: 1.125rem; font-weight: 800; color: #1e40af;">將軍澳培智學校</div>
-  <div style="font-size: 0.75rem; color: #3b82f6; opacity: 0.85;">Tseung Kwan O Pui Chi School</div>
+  <div class="school-name-main" style="font-size: 1.125rem; font-weight: 800; color: #1e40af;">將軍澳培智學校</div>
+  <div class="school-name-en" style="font-size: 0.75rem; color: #3b82f6; opacity: 0.85;">Tseung Kwan O Pui Chi School</div>
 </header>
 
   <nav class="sticky top-0 z-40 glass border-b-4 border-blue-200 px-4 py-3">
@@ -356,7 +493,7 @@
     </div>
   </nav>
 
-  <main class="max-w-3xl mx-auto px-4 pt-6 pb-80">
+  <main id="app-main" class="max-w-3xl mx-auto px-4 pt-6">
     <!-- Confirm hint banner -->
     <div id="confirmHint" class="hidden mb-4 bg-green-50 border-3 border-green-400 rounded-2xl px-5 py-3 text-center">
       <p class="text-green-700 font-extrabold text-lg">
@@ -369,13 +506,14 @@
       <p class="font-extrabold text-orange-600" id="stepLabel">第 1 步 / 共 5 步</p>
     </div>
 
+    <div class="step-scroll">
     <!-- Step 1 -->
     <section id="step-1" class="step-panel active">
       <h2 class="text-3xl font-extrabold mb-2">👤 邊個係主角？</h2>
       <p class="text-lg text-stone-600 mb-5">
         <i class="fa-solid fa-hand-pointer text-orange-400 mr-1"></i>撳卡揀，再撳同一張卡確認 ✅
       </p>
-      <div class="grid grid-cols-2 gap-3" id="who-grid"></div>
+      <div class="grid grid-cols-2 gap-3 card-grid" id="who-grid"></div>
       <button id="whoMoreBtn" onclick="toggleShowMore('who')" class="hidden mt-3 w-full bg-white text-orange-600 font-extrabold px-4 py-3 rounded-2xl border-2 border-orange-200 text-sm">
         <i class="fa-solid fa-plus-circle mr-1"></i>顯示更多進階選項
       </button>
@@ -386,7 +524,7 @@
       <h2 class="text-3xl font-extrabold mb-2">🎯 佢哋做緊咩？</h2>
       <p class="text-lg text-stone-600 mb-2">可以揀 <b>1 至 2</b> 件開心嘅事。</p>
       <p id="actPickHint" class="text-base font-extrabold text-orange-600 mb-4">已揀 0 / 2</p>
-      <div class="grid grid-cols-2 gap-3" id="act-grid"></div>
+      <div class="grid grid-cols-2 gap-3 card-grid" id="act-grid"></div>
       <button id="actMoreBtn" onclick="toggleShowMore('act')" class="hidden mt-3 w-full bg-white text-orange-600 font-extrabold px-4 py-3 rounded-2xl border-2 border-orange-200 text-sm">
         <i class="fa-solid fa-plus-circle mr-1"></i>顯示更多進階選項
       </button>
@@ -396,7 +534,7 @@
     <section id="step-3" class="step-panel">
       <h2 class="text-3xl font-extrabold mb-2">🎨 畫面係咩感覺？</h2>
       <p class="text-lg text-stone-600 mb-5">揀一種畫法，愈簡單愈好。</p>
-      <div class="grid grid-cols-2 gap-3" id="style-grid"></div>
+      <div class="grid grid-cols-2 gap-3 card-grid" id="style-grid"></div>
       <button id="styleMoreBtn" onclick="toggleShowMore('style')" class="hidden mt-3 w-full bg-white text-orange-600 font-extrabold px-4 py-3 rounded-2xl border-2 border-orange-200 text-sm">
         <i class="fa-solid fa-plus-circle mr-1"></i>顯示更多進階選項
       </button>
@@ -407,7 +545,7 @@
       <h2 class="text-3xl font-extrabold mb-2">🌙 夜空同顏色</h2>
       <p class="text-lg text-stone-600 mb-2">可以揀 <b>1 至 2</b> 種顏色（例如金+紅）。</p>
       <p id="colorPickHint" class="text-base font-extrabold text-orange-600 mb-4">已揀 0 / 2</p>
-      <div class="grid grid-cols-2 gap-3" id="color-grid"></div>
+      <div class="grid grid-cols-2 gap-3 card-grid" id="color-grid"></div>
       <button id="colorMoreBtn" onclick="toggleShowMore('color')" class="hidden mt-3 w-full bg-white text-orange-600 font-extrabold px-4 py-3 rounded-2xl border-2 border-orange-200 text-sm">
         <i class="fa-solid fa-plus-circle mr-1"></i>顯示更多進階選項
       </button>
@@ -422,12 +560,17 @@
       <!-- Optional student name → affects prompt -->
       <div class="mt-5 p-4 bg-white rounded-3xl border-4 border-amber-200">
         <label for="studentName" class="block text-lg font-extrabold text-stone-700 mb-2">
-          ✏️ 學生名字 <span class="text-stone-400 font-bold text-base">（可選）</span>
+          ✏️ 學生名字 <span class="text-stone-400 font-bold text-base">（可選 · 名單優先）</span>
         </label>
-        <input id="studentName" type="text" maxlength="20" autocomplete="off"
-          placeholder="例如：小明（唔填都得）"
-          class="w-full text-xl font-extrabold border-4 border-orange-200 rounded-2xl px-4 py-3 focus:border-orange-500 focus:outline-none"
-          oninput="onStudentNameInput()">
+        <div id="studentNameWrap">
+          <select id="studentNameSelect" class="w-full text-xl font-extrabold border-4 border-orange-200 rounded-2xl px-4 py-3 focus:border-orange-500 focus:outline-none mb-2 hidden" onchange="onStudentSelectChange()">
+            <option value="">— 揀學生 —</option>
+          </select>
+          <input id="studentName" type="text" maxlength="20" autocomplete="off"
+            placeholder="例如：小明（唔填都得）"
+            class="w-full text-xl font-extrabold border-4 border-orange-200 rounded-2xl px-4 py-3 focus:border-orange-500 focus:outline-none"
+            oninput="onStudentNameInput()">
+        </div>
         <p class="text-sm text-stone-500 mt-2 font-semibold">填咗會寫入提詞；唔填就照常生成。</p>
       </div>
 
@@ -439,8 +582,11 @@
       </div>
     </section>
 
-    <!-- Navigation -->
-    <div class="mt-8 flex justify-between items-center">
+
+    </div><!-- /.step-scroll -->
+  </main>
+  <div id="bottom-nav" class="no-print">
+    <div class="max-w-3xl mx-auto flex justify-between items-center gap-3 px-2">
       <button id="prevBtn" onclick="go(-1)" class="invisible font-extrabold text-white text-lg px-6 py-4 rounded-3xl bg-stone-400">
         <i class="fa-solid fa-arrow-left mr-2"></i>返去
       </button>
@@ -450,7 +596,7 @@
         </button>
       </div>
     </div>
-  </main>
+  </div>
 
   <!-- Result panel -->
   <div id="result-panel" class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[96%] max-w-3xl z-50">
@@ -557,6 +703,19 @@
             <h3 class="font-extrabold text-stone-700 mb-2">📋 歷史記錄</h3>
             <div id="history-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
             <button onclick="clearHistory()" class="mt-2 text-sm text-red-500 font-bold underline">清除全部歷史</button>
+          </div>
+          <!-- Class Roster (v1.3.3) -->
+          <div class="border-t-2 border-stone-200 pt-4">
+            <h3 class="font-extrabold text-stone-700 mb-2">👥 學生名單</h3>
+            <p class="text-sm text-stone-500 mb-2">最多 10 人。有名單時第 5 步用下拉揀名（SEN 少打字）。</p>
+            <div id="roster-list" class="space-y-2 mb-2 max-h-40 overflow-y-auto"></div>
+            <div class="flex gap-2">
+              <input id="rosterNewName" type="text" maxlength="20" placeholder="新學生名"
+                class="flex-1 border-2 border-stone-300 rounded-xl px-3 py-2 font-bold"
+                onkeydown="if(event.key==='Enter')addRosterName()">
+              <button type="button" onclick="addRosterName()" class="bg-orange-500 text-white font-extrabold px-4 py-2 rounded-xl">加入</button>
+            </div>
+            <button type="button" onclick="importRosterFromHistory()" class="mt-2 text-sm text-sky-600 font-bold underline">由歷史匯入名字</button>
           </div>
           <!-- Prompt Export (v1.3.2) -->
           <div class="border-t-2 border-stone-200 pt-4">
@@ -1342,8 +1501,12 @@ function setTab(t) {
 }
 
 function getStudentName() {
-  const el = document.getElementById('studentName');
-  return (el?.value || '').trim().slice(0, 20);
+  const sel = document.getElementById('studentNameSelect');
+  const input = document.getElementById('studentName');
+  if (sel && !sel.classList.contains('hidden') && sel.value && sel.value !== '__other__') {
+    return sel.value.trim();
+  }
+  return (input && input.value ? input.value : '').trim();
 }
 function onStudentNameInput() {
   // live refresh prompt if already has picks / generated
@@ -1702,6 +1865,8 @@ function renderTeacherPanel() {
   renderTeacherList('edit-act', td.act, 'act');
   renderTeacherList('edit-style', td.style, 'style');
   renderHistory();
+  renderRoster();
+  refreshStudentNameUI();
 }
 function renderTeacherList(elId, list, key) {
   const box = document.getElementById(elId);
@@ -1746,7 +1911,121 @@ function addTeacherItem(key) {
 }
 
 // ── History ────────────────────────────────────────────────────────────────
+
 const HISTORY_KEY = 'midautumn_history';
+const ROSTER_KEY = 'midautumn_roster';
+const ROSTER_MAX = 10;
+
+function getRoster() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(ROSTER_KEY) || '[]');
+    return Array.isArray(arr) ? arr.filter(x => x && x.name).slice(0, ROSTER_MAX) : [];
+  } catch (e) { return []; }
+}
+function saveRoster(arr) {
+  localStorage.setItem(ROSTER_KEY, JSON.stringify((arr || []).slice(0, ROSTER_MAX)));
+}
+function addRosterName() {
+  const input = document.getElementById('rosterNewName');
+  const name = (input && input.value || '').trim();
+  if (!name) { showToast('請輸入名字', 'bg-red-500'); return; }
+  const list = getRoster();
+  if (list.some(x => x.name === name)) { showToast('已有呢個名', 'bg-orange-500'); return; }
+  if (list.length >= ROSTER_MAX) { showToast('名單最多 ' + ROSTER_MAX + ' 人', 'bg-red-500'); return; }
+  list.push({ name: name, createdAt: new Date().toISOString() });
+  saveRoster(list);
+  if (input) input.value = '';
+  renderRoster();
+  refreshStudentNameUI();
+  showToast('已加入 ' + name, 'bg-green-500');
+}
+function removeRosterName(idx) {
+  const list = getRoster();
+  if (idx < 0 || idx >= list.length) return;
+  const n = list[idx].name;
+  list.splice(idx, 1);
+  saveRoster(list);
+  renderRoster();
+  refreshStudentNameUI();
+  showToast('已移除 ' + n, 'bg-green-500');
+}
+function importRosterFromHistory() {
+  const list = getRoster();
+  const names = new Set(list.map(x => x.name));
+  let added = 0;
+  getHistory().forEach(r => {
+    const n = (r.name || '').trim();
+    if (!n || names.has(n) || list.length >= ROSTER_MAX) return;
+    list.push({ name: n, createdAt: new Date().toISOString() });
+    names.add(n);
+    added++;
+  });
+  saveRoster(list);
+  renderRoster();
+  refreshStudentNameUI();
+  showToast(added ? ('匯入 ' + added + ' 個名') : '冇新名字可匯入', added ? 'bg-green-500' : 'bg-orange-500');
+}
+function renderRoster() {
+  const box = document.getElementById('roster-list');
+  if (!box) return;
+  const list = getRoster();
+  if (!list.length) {
+    box.innerHTML = '<p class="text-stone-400 text-sm">未有名單 — 可手動加入或由歷史匯入。</p>';
+    return;
+  }
+  box.innerHTML = list.map((x, i) =>
+    '<div class="flex items-center justify-between gap-2 bg-stone-50 border border-stone-200 rounded-xl px-3 py-2">'
+    + '<span class="font-extrabold text-stone-700">' + escapeHtml(x.name) + '</span>'
+    + '<button type="button" class="text-red-500 font-bold text-xs underline" onclick="removeRosterName(' + i + ')">刪除</button>'
+    + '</div>'
+  ).join('');
+}
+function refreshStudentNameUI() {
+  const sel = document.getElementById('studentNameSelect');
+  const input = document.getElementById('studentName');
+  if (!sel || !input) return;
+  const list = getRoster();
+  const cur = input.value.trim();
+  if (list.length) {
+    sel.classList.remove('hidden');
+    const opts = ['<option value="">— 揀學生 —</option>']
+      .concat(list.map(x => '<option value="' + escapeHtml(x.name) + '"' + (x.name === cur ? ' selected' : '') + '>' + escapeHtml(x.name) + '</option>'))
+      .concat(['<option value="__other__">其他（自己填）</option>']);
+    sel.innerHTML = opts.join('');
+    if (cur && list.some(x => x.name === cur)) {
+      sel.value = cur;
+      input.classList.add('hidden');
+    } else if (cur) {
+      sel.value = '__other__';
+      input.classList.remove('hidden');
+    } else {
+      sel.value = '';
+      input.classList.add('hidden');
+    }
+  } else {
+    sel.classList.add('hidden');
+    input.classList.remove('hidden');
+  }
+}
+function onStudentSelectChange() {
+  const sel = document.getElementById('studentNameSelect');
+  const input = document.getElementById('studentName');
+  if (!sel || !input) return;
+  if (sel.value === '__other__') {
+    input.classList.remove('hidden');
+    input.value = '';
+    input.focus();
+  } else if (sel.value === '') {
+    input.value = '';
+    input.classList.add('hidden');
+  } else {
+    input.value = sel.value;
+    input.classList.add('hidden');
+  }
+  if (typeof onStudentNameInput === 'function') onStudentNameInput();
+}
+
+
 function getHistory() {
   try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
   catch { return []; }
@@ -2153,10 +2432,14 @@ renderAll();
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initThemeSwitcher);
-  } else {
+  function bootUI() {
     initThemeSwitcher();
+    if (typeof refreshStudentNameUI === 'function') refreshStudentNameUI();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootUI);
+  } else {
+    bootUI();
   }
 })();
 </script>
