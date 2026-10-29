@@ -329,7 +329,7 @@
           <button class="theme-btn" type="button" data-theme="mid-autumn" aria-pressed="true" aria-label="中秋節主題">
             <span aria-hidden="true">🌕</span><span class="sr-only">中秋節</span>
           </button>
-          <button class="theme-btn" type="button" data-theme="spring-festival" aria-pressed="false" aria-label="新年主題" disabled>
+          <button class="theme-btn" type="button" data-theme="spring-festival" aria-pressed="false" aria-label="新年主題">
             <span aria-hidden="true">🧧</span><span class="sr-only">新年</span>
           </button>
           <button class="theme-btn" type="button" data-theme="christmas" aria-pressed="false" aria-label="聖誕節主題">
@@ -705,6 +705,49 @@ const christmasData = {
   ]
 };
 
+const NEG_SPRING_ZH = '唔好恐怖、唔好黑暗、唔好複雜字、唔好模糊、唔好有浮水印、唔好有西方節日元素（聖誕樹、雪人）、唔好有宗教符號';
+const NEG_SPRING_CN = '不要恐怖、不要黑暗、不要复杂的字、不要模糊、不要有水印、不要西方节日元素（圣诞树、雪人）、不要宗教符号';
+const NEG_SPRING_EN = 'no horror, no dark scary mood, no messy text, no blurry faces, no watermark, no western holiday elements (no Christmas tree, no snowman), no religious symbols';
+
+// Lunar New Year theme data (v1.4.3 — 2026-10-29)
+const springFestivalData = {
+  who: [
+    { id:'mom', zh:'媽媽', zhCn:'妈妈', en:'a kind mother in festive red clothes', img:'img/spring-festival/who-mom.jpg' },
+    { id:'dad', zh:'爸爸', zhCn:'爸爸', en:'a kind father smiling warmly', img:'img/spring-festival/who-dad.jpg' },
+    { id:'kids', zh:'小朋友', zhCn:'小朋友', en:'cheerful children in new year outfits', img:'img/spring-festival/who-kids.jpg' },
+    { id:'grandparents', zh:'爺爺奶奶', zhCn:'爷爷奶奶', en:'kind grandpa and grandma together', img:'img/spring-festival/who-grandparents.jpg' },
+    { id:'lion', zh:'舞獅', zhCn:'舞狮', en:'a colorful friendly Chinese lion dance costume', img:'img/spring-festival/who-lion.jpg' },
+    { id:'caishen', zh:'財神', zhCn:'财神', en:'a friendly cheerful Chinese god of wealth with gold ingot', img:'img/spring-festival/who-caishen.jpg' },
+    { id:'family', zh:'全家福', zhCn:'全家福', en:'a warm whole family reunion portrait', img:'img/spring-festival/who-family.jpg' }
+  ],
+  act: [
+    { id:'redpacket', zh:'拎紅包', zhCn:'拿红包', en:'holding bright red envelopes with gold patterns', img:'img/spring-festival/act-redpacket.jpg' },
+    { id:'couplet', zh:'貼揮春', zhCn:'贴春联', en:'pasting red Chinese New Year couplets on a door', img:'img/spring-festival/act-couplet.jpg' },
+    { id:'fireworks', zh:'放煙花', zhCn:'放烟花', en:'watching colorful safe fireworks in the night sky', img:'img/spring-festival/act-fireworks.jpg' },
+    { id:'visit', zh:'拜年', zhCn:'拜年', en:'paying New Year visits with warm greetings and smiles', img:'img/spring-festival/act-visit.jpg' },
+    { id:'niangao', zh:'食年糕', zhCn:'吃年糕', en:'happily eating sweet sticky rice cake', img:'img/spring-festival/act-niangao.jpg' },
+    { id:'liondance', zh:'睇舞獅', zhCn:'看舞狮', en:'watching a lively Chinese lion dance performance', img:'img/spring-festival/act-liondance.jpg' },
+    { id:'laissee', zh:'逗利是', zhCn:'收红包', en:'receiving lucky red packets with joy', img:'img/spring-festival/act-laissee.jpg' }
+  ],
+  style: [
+    { id:'ink', zh:'中國水墨', zhCn:'中国水墨', en:'Chinese ink wash painting, soft brush strokes', img:'img/spring-festival/style-ink.jpg' },
+    { id:'papercut', zh:'紅金剪紙', zhCn:'红金剪纸', en:'red and gold Chinese paper-cut folk art, flat shapes', img:'img/spring-festival/style-papercut.jpg' },
+    { id:'gongbi', zh:'國畫工筆', zhCn:'国画工笔', en:'fine Chinese gongbi painting, detailed elegant lines', img:'img/spring-festival/style-gongbi.jpg' },
+    { id:'cartoon', zh:'卡通可愛', zhCn:'卡通可爱', en:'cute kawaii cartoon, big faces, simple shapes', img:'img/spring-festival/style-cartoon.jpg' },
+    { id:'traditional', zh:'傳統年畫', zhCn:'传统年画', en:'traditional Chinese New Year nianhua poster style', img:'img/spring-festival/style-traditional.jpg' },
+    { id:'modern', zh:'現代插畫', zhCn:'现代插画', en:'modern festive illustration, clean bright colors', img:'img/spring-festival/style-modern.jpg' }
+  ],
+  color: [
+    { id:'red', zh:'紅色（紅包）', zhCn:'红色（红包）', en:'bright festive Chinese red, lucky envelope red', css:'linear-gradient(135deg,#dc2626,#fbbf24)' },
+    { id:'gold', zh:'金色（金幣）', zhCn:'金色（金币）', en:'shimmering gold, wealth and prosperity gold', css:'linear-gradient(135deg,#f59e0b,#fde68a)' },
+    { id:'pink', zh:'桃紅（桃花）', zhCn:'桃红（桃花）', en:'soft peach blossom pink', css:'linear-gradient(135deg,#fb7185,#fecdd3)' },
+    { id:'orange', zh:'橙色（年桔）', zhCn:'橙色（年桔）', en:'bright mandarin orange festive glow', css:'linear-gradient(135deg,#ea580c,#fdba74)' },
+    { id:'purple', zh:'紫色（華麗）', zhCn:'紫色（华丽）', en:'rich festive purple with soft gold', css:'linear-gradient(135deg,#7c3aed,#c4b5fd)' },
+    { id:'silver', zh:'銀色（燈飾）', zhCn:'银色（灯饰）', en:'silvery white festive lantern light', css:'linear-gradient(135deg,#94a3b8,#e2e8f0)' }
+  ]
+};
+
+
 // ── Theme registry (module level for v1.4.2 actual theme switching) ──────
 const THEMES = {
   'mid-autumn': {
@@ -719,8 +762,14 @@ const THEMES = {
     label: '新年',
     icon: '🧧',
     navTitle: '新年畫畫提詞器',
-    ready: false,
-    comingSoonMsg: '新年畫畫提詞器仲未 ready,等緊 v1.4.3 — 2026 年底前推出！'
+    ready: true,
+    comingSoonMsg: '',
+    data: springFestivalData,
+    negativePrompts: {
+      zh: NEG_SPRING_ZH,
+      zhCn: NEG_SPRING_CN,
+      en: NEG_SPRING_EN
+    }
   },
   'christmas': {
     label: '聖誕節',
@@ -1248,11 +1297,24 @@ function updatePrompt() {
   const negEn = themeNeg ? themeNeg.en : NEG_EN;
 
   // v1.4.4: theme-specific opening line
-  const themeOpening = {
-    zh: currentTheme === 'christmas' ? '一張開心、容易睇嘅聖誕節圖。' : '一張開心、容易睇嘅中秋節圖。',
-    zhCn: currentTheme === 'christmas' ? '一张开心、容易看的圣诞节图片。' : '一张开心、容易看的中秋节图片。',
-    en: currentTheme === 'christmas' ? 'A joyful Christmas scene that is easy to understand.' : 'A joyful Mid-Autumn Festival scene that is easy to understand.'
+  const themeOpeningMap = {
+    'mid-autumn': {
+      zh: '一張開心、容易睇嘅中秋節圖。',
+      zhCn: '一张开心、容易看的中秋节图片。',
+      en: 'A joyful Mid-Autumn Festival scene that is easy to understand.'
+    },
+    'christmas': {
+      zh: '一張開心、容易睇嘅聖誕節圖。',
+      zhCn: '一张开心、容易看的圣诞节图片。',
+      en: 'A joyful Christmas scene that is easy to understand.'
+    },
+    'spring-festival': {
+      zh: '一張開心、容易睇嘅新年圖。',
+      zhCn: '一张开心、容易看的新年图片。',
+      en: 'A joyful Lunar New Year scene that is easy to understand.'
+    }
   };
+  const themeOpening = themeOpeningMap[currentTheme] || themeOpeningMap['mid-autumn'];
 
   updateResultPanelVisibility();
   if (!who && !actItems.length && !st && !colItems.length) {
