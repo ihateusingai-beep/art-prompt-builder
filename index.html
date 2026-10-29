@@ -192,13 +192,14 @@
     <div class="school-name-en">Tseung Kwan O Pui Chi School</div>
     <h1>🎨 節日畫畫提詞器</h1>
     <p class="tagline">SEN 老師用嘅多節日 AI 提詞工具 — 同學 5 步揀,AI 即刻出圖</p>
-    <span class="version-badge">v1.4.5 · 多節日 platform</span>
+    <span class="version-badge">v1.4.6 · 多節日 platform</span>
   </header>
 
   <main>
     <div class="grid" role="list">
       <button class="card" type="button" role="listitem"
               data-holiday="mid-autumn"
+              onclick="window.location.href='holiday-prompt-builder.html?holiday=mid-autumn'"
               aria-label="中秋節畫畫提詞器 (Mid-Autumn Prompt Builder)">
         <div class="icon" aria-hidden="true">🌕</div>
         <div class="name-zh">中秋節</div>
@@ -284,20 +285,10 @@
     }, 2400);
   }
 
-  function navigateToMidAutumn() {
-    setSelectedHoliday('mid-autumn');
-    window.location.href = 'midautumn-prompt-builder.html';
-  }
-
   function navigateToHoliday(id) {
     setSelectedHoliday(id);
-    if (id === 'mid-autumn') {
-      // Mid-autumn has its own canonical file (v1.2.3 baseline)
-      window.location.href = 'midautumn-prompt-builder.html';
-    } else {
-      // Other ready themes go via mega file with ?holiday=<id>
-      window.location.href = 'holiday-prompt-builder.html?holiday=' + id;
-    }
+    // v1.4.6 cutover: all holidays via mega file
+    window.location.href = 'holiday-prompt-builder.html?holiday=' + encodeURIComponent(id);
   }
 
   function initCards() {
