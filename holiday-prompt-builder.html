@@ -56,10 +56,34 @@
     .speak-btn.no-voice { color: #9ca3af; border-color: #d1d5db; cursor: not-allowed; }
     .speak-btn.no-voice:hover { transform: none; background: rgba(255,255,255,0.9); }
     @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
-    .big-mode .card { min-height: 148px; }
-    .big-mode .card-text { font-size: 1.5rem !important; }
-    .big-mode h2 { font-size: 2.2rem !important; }
-    .big-mode .speak-btn { width: 44px; height: 44px; font-size: 18px; }
+    /* === BOARD-UX-v1 === */
+    /* Text/board scale 0=標準 1=大字 2=超大(Board) */
+    body.text-scale-1 .card { min-height: 148px; }
+    body.text-scale-1 .card-text { font-size: 1.35rem !important; }
+    body.text-scale-1 h2 { font-size: 1.9rem !important; }
+    body.text-scale-1 .speak-btn { width: 44px; height: 44px; font-size: 18px; }
+    body.text-scale-2 .card { min-height: 160px; }
+    body.text-scale-2 .card-text { font-size: 1.55rem !important; }
+    body.text-scale-2 h2 { font-size: 2.1rem !important; }
+    body.text-scale-2 .speak-btn { width: 48px; height: 48px; font-size: 20px; }
+    @media (hover:hover) and (pointer:fine) {
+      .card:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 24px -10px rgba(234,88,12,.35); z-index: 2; }
+    }
+    #dots .step-dot {
+      width: 16px; height: 16px; border-radius: 9999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 800; color: #9a3412;
+      transition: transform .15s, background .15s, opacity .15s;
+    }
+    body.text-scale-1 #dots .step-dot { width: 22px; height: 22px; font-size: 0.7rem; }
+    body.text-scale-2 #dots .step-dot { width: 28px; height: 28px; font-size: 0.8rem; }
+    #whoMultiBtn.is-on {
+      background: #fde047 !important; border-color: #ca8a04 !important; color: #713f12 !important;
+    }
+    #summary-list .sum-thumb { width: 72px; height: 72px; }
+    body.text-scale-1 #summary-list .sum-thumb { width: 96px; height: 96px; }
+    body.text-scale-2 #summary-list .sum-thumb { width: 120px; height: 120px; }
+    #fsBtn.is-fs { background: #ffedd5; border-color: #ea580c; color: #c2410c; }
 
     /* Teacher modal */
     .modal-overlay {
@@ -191,8 +215,7 @@
       100% { box-shadow: 0 0 0 0 rgba(234,88,12,0); }
     }
     .card.just-picked { animation: pickFlash 0.5s ease-out; }
-    /* Big mode step dots */
-    .big-mode #dots span { width: 20px !important; height: 20px !important; }
+    /* step dots sized via .step-dot + text-scale-* */
     /* Confirmed summary row glow */
     @keyframes rowGlow {
       0%,100% { box-shadow: 0 0 0 0 rgba(234,88,12,.0); }
@@ -337,9 +360,37 @@
       padding: 0.45rem !important;
     }
     body.app-shell > footer { display: none !important; }
-    body.app-shell.big-mode .card .card-text { font-size: 1.1rem !important; }
-    body.app-shell.big-mode .step-panel h2 { font-size: 1.5rem !important; }
-    body.app-shell.big-mode .card img { width: 64px !important; height: 64px !important; }
+    /* app-shell × text scale (Board = real enlarge + fewer first-screen cols) */
+    body.app-shell.text-scale-1 .card .card-text { font-size: 1.15rem !important; }
+    body.app-shell.text-scale-1 .step-panel h2 { font-size: 1.6rem !important; }
+    body.app-shell.text-scale-1 .card img { width: 88px !important; height: 88px !important; }
+    body.app-shell.text-scale-1 .speak-btn { width: 36px !important; height: 36px !important; font-size: 14px !important; }
+    body.app-shell.text-scale-1 #bottom-nav button {
+      padding: 0.75rem 1.25rem !important; font-size: 1.1rem !important; min-height: 56px;
+    }
+    body.app-shell.text-scale-1 .confirm-badge { width: 48px !important; height: 48px !important; font-size: 20px !important; }
+
+    body.app-shell.text-scale-2 .card-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.55rem !important;
+    }
+    body.app-shell.text-scale-2 .card .card-text { font-size: 1.3rem !important; line-height: 1.2 !important; }
+    body.app-shell.text-scale-2 .step-panel h2 { font-size: 1.75rem !important; }
+    body.app-shell.text-scale-2 .step-panel > p { font-size: 1.05rem !important; }
+    body.app-shell.text-scale-2 .card img { width: 120px !important; height: 120px !important; }
+    body.app-shell.text-scale-2 .card { padding: 0.5rem !important; }
+    body.app-shell.text-scale-2 .speak-btn { width: 42px !important; height: 42px !important; font-size: 16px !important; }
+    body.app-shell.text-scale-2 .confirm-badge { width: 56px !important; height: 56px !important; font-size: 22px !important; }
+    body.app-shell.text-scale-2 #bottom-nav button {
+      padding: 0.9rem 1.4rem !important; font-size: 1.25rem !important; min-height: 72px;
+    }
+    body.app-shell.text-scale-2 #bottom-nav { padding: 0.55rem 0.75rem calc(0.55rem + env(safe-area-inset-bottom)); }
+    body.app-shell.text-scale-2 nav button { min-height: 44px; }
+    @media (min-width: 1100px) {
+      body.app-shell:not(.text-scale-2) .card img { width: 72px !important; height: 72px !important; }
+      body.app-shell.text-scale-1 .card img { width: 100px !important; height: 100px !important; }
+      body.app-shell.text-scale-2 .card img { width: 140px !important; height: 140px !important; }
+    }
     body.app-shell .modal-box { max-height: 85dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     /* Theme switcher (v1.4.2 mega scaffold) */
     .theme-switcher {
@@ -476,8 +527,14 @@
             <span aria-hidden="true">🐲</span><span class="sr-only">端午節</span>
           </button>
         </div>
-        <button id="bigModeBtn" onclick="toggleBigMode()" class="bg-white text-stone-500 font-bold px-3 py-2 rounded-2xl border-2 border-stone-200 text-sm">
-          <i class="fa-solid fa-text-height"></i> 大字
+        <button id="bigModeBtn" onclick="cycleTextScale()" class="bg-white text-stone-500 font-bold px-3 py-2 rounded-2xl border-2 border-stone-200 text-sm" title="字級：標準 → 大字 → 超大（課堂）" aria-label="切換字級">
+          <i class="fa-solid fa-text-height"></i> <span id="bigModeLabel">標準</span>
+        </button>
+        <button id="whoMultiBtn" onclick="toggleWhoMulti()" class="bg-white text-stone-500 font-bold px-3 py-2 rounded-2xl border-2 border-stone-200 text-sm" title="主角多選（最多2）" aria-pressed="false" aria-label="主角多選">
+          <i class="fa-solid fa-layer-group"></i> 多選
+        </button>
+        <button id="fsBtn" onclick="toggleFullscreen()" class="bg-white text-stone-500 font-bold px-3 py-2 rounded-2xl border-2 border-stone-200 text-sm" title="全螢幕" aria-label="全螢幕">
+          <i class="fa-solid fa-expand" id="fsIcon"></i>
         </button>
         <button id="soundToggle" onclick="toggleSound()" aria-label="音效開關" class="bg-white text-stone-500 font-bold px-3 py-2 rounded-2xl border-2 border-stone-200 text-sm">
           <i class="fa-solid fa-volume-high" id="soundIcon" aria-hidden="true"></i>
@@ -510,9 +567,10 @@
     <!-- Step 1 -->
     <section id="step-1" class="step-panel active">
       <h2 class="text-3xl font-extrabold mb-2">👤 邊個係主角？</h2>
-      <p class="text-lg text-stone-600 mb-5">
+      <p id="whoPickGuide" class="text-lg text-stone-600 mb-2">
         <i class="fa-solid fa-hand-pointer text-orange-400 mr-1"></i>撳卡揀，再撳同一張卡確認 ✅
       </p>
+      <p id="whoPickHint" class="hidden text-base font-extrabold text-orange-600 mb-4">已揀 0 / 2</p>
       <div class="grid grid-cols-2 gap-3 card-grid" id="who-grid"></div>
       <button id="whoMoreBtn" onclick="toggleShowMore('who')" class="hidden mt-3 w-full bg-white text-orange-600 font-extrabold px-4 py-3 rounded-2xl border-2 border-orange-200 text-sm">
         <i class="fa-solid fa-plus-circle mr-1"></i>顯示更多進階選項
@@ -1046,11 +1104,16 @@ const PIN_KEY = 'midautumn_pin';
 let step = 1;
 const total = 5;
 let tab = 'zh';
-const MULTI_KEYS = { act: true, color: true };
+const MULTI_KEYS = { act: true, color: true }; // who via whoMultiEnabled
 const MULTI_MAX = 2;
+const TEXT_SCALE_KEY = 'midautumn_text_scale';
+const WHO_MULTI_KEY = 'midautumn_who_multi';
+const TEXT_SCALE_LABELS = ['標準', '大字', '超大'];
 let sel = { who: null, act: [], style: null, color: [] };
 let generated = false;
-let bigMode = false;
+let textScale = 0; // 0 standard, 1 big, 2 board
+let bigMode = false; // derived: textScale >= 1 (skip two-tap / auto-advance)
+let whoMultiEnabled = false;
 let soundOn = true;
 let speakingId = null;
 let hasZhVoice = false;
@@ -1161,7 +1224,7 @@ document.addEventListener('keydown', e => {
 
 // ── Render helpers ────────────────────────────────────────────────────────
 const getDataList = key => getCurrentData()[key] || [];
-function isMulti(key) { return !!MULTI_KEYS[key]; }
+function isMulti(key) { if (key === 'who') return whoMultiEnabled; return !!MULTI_KEYS[key]; }
 function getSelItems(key) {
   if (isMulti(key)) return Array.isArray(sel[key]) ? sel[key] : [];
   return sel[key] ? [sel[key]] : [];
@@ -1208,8 +1271,24 @@ function applyPick(key, item) {
 function updateMultiHints() {
   const actEl = document.getElementById('actPickHint');
   const colEl = document.getElementById('colorPickHint');
+  const whoEl = document.getElementById('whoPickHint');
+  const whoGuide = document.getElementById('whoPickGuide');
   if (actEl) actEl.textContent = `已揀 ${getSelItems('act').length} / ${MULTI_MAX}`;
   if (colEl) colEl.textContent = `已揀 ${getSelItems('color').length} / ${MULTI_MAX}`;
+  if (whoEl) {
+    whoEl.textContent = `已揀 ${getSelItems('who').length} / ${MULTI_MAX}`;
+    whoEl.classList.toggle('hidden', !whoMultiEnabled);
+  }
+  if (whoGuide) {
+    whoGuide.innerHTML = whoMultiEnabled
+      ? '<i class="fa-solid fa-layer-group text-yellow-500 mr-1"></i>多選模式：可揀 <b>1 至 2</b> 個主角（再撳取消）'
+      : '<i class="fa-solid fa-hand-pointer text-orange-400 mr-1"></i>撳卡揀，再撳同一張卡確認 ✅';
+  }
+  const wbtn = document.getElementById('whoMultiBtn');
+  if (wbtn) {
+    wbtn.classList.toggle('is-on', whoMultiEnabled);
+    wbtn.setAttribute('aria-pressed', whoMultiEnabled ? 'true' : 'false');
+  }
 }
 
 function renderCard(item, key) {
@@ -1261,25 +1340,34 @@ function renderCard(item, key) {
 // Default visible count per category (rest = "advanced" hidden behind toggle)
 // SEN-friendly: keep only the most concrete / common options on first paint.
 const DEFAULT_COUNTS = { who: 9, act: 9, style: 6, color: 6 };
+const BOARD_COUNTS = { who: 6, act: 6, style: 4, color: 4 }; // textScale 2 — fewer first-screen for bigger cards
+const BIG_COUNTS = { who: 6, act: 6, style: 6, color: 6 };   // textScale 1
 const SHOW_MORE_KEY = 'midautumn_show_more';
 let showMore = { who: false, act: false, style: false, color: false };
+function getDefaultCounts() {
+  if (textScale >= 2) return BOARD_COUNTS;
+  if (textScale >= 1) return BIG_COUNTS;
+  return DEFAULT_COUNTS;
+}
 // Single factory: pass the grid element id + the data key
 const renderGrid = (id, key) => {
   const all = getDataList(key);
-  const limit = showMore[key] ? all.length : (DEFAULT_COUNTS[key] ?? all.length);
+  const dc = getDefaultCounts();
+  const limit = showMore[key] ? all.length : (dc[key] ?? all.length);
   document.getElementById(id).innerHTML = all.slice(0, limit).map(item => renderCard(item, key)).join('');
 };
 
 // Show "more" toggle button only when there ARE hidden options
 function updateMoreButtons() {
+  const dc = getDefaultCounts();
   [['who', 'whoMoreBtn'], ['act', 'actMoreBtn'], ['style', 'styleMoreBtn'], ['color', 'colorMoreBtn']].forEach(([key, btnId]) => {
     const btn = document.getElementById(btnId);
     if (!btn) return;
-    const hasHidden = getDataList(key).length > (DEFAULT_COUNTS[key] ?? 0);
+    const hasHidden = getDataList(key).length > (dc[key] ?? 0);
     btn.classList.toggle('hidden', !hasHidden);
     btn.innerHTML = showMore[key]
       ? '<i class="fa-solid fa-minus-circle mr-1"></i>收埋進階選項'
-      : `<i class="fa-solid fa-plus-circle mr-1"></i>顯示更多進階選項 (${getDataList(key).length - (DEFAULT_COUNTS[key] ?? 0)} 個)`;
+      : `<i class="fa-solid fa-plus-circle mr-1"></i>顯示更多進階選項 (${getDataList(key).length - (dc[key] ?? 0)} 個)`;
   });
 }
 
@@ -1293,7 +1381,7 @@ function toggleShowMore(key) {
 // ── Summary ───────────────────────────────────────────────────────────────
 let _prevSel = { who:null, act:[], style:null, color:[] };
 function renderSummary() {
-  const stepNames = { who:'👤 主角', act:'🎯 活動（可多選）', style:'🎨 畫風', color:'🌙 顏色（可多選）' };
+  const stepNames = { who: whoMultiEnabled ? '👤 主角（可多選）' : '👤 主角', act:'🎯 活動（可多選）', style:'🎨 畫風', color:'🌙 顏色（可多選）' };
   const summaryList = document.getElementById('summary-list');
   summaryList.innerHTML = ['who','act','style','color'].map(key => {
     const items = getSelItems(key);
@@ -1305,22 +1393,22 @@ function renderSummary() {
     const flashClass = wasUpdated ? 'summary-row-flash' : '';
     let imgTag;
     if (!done) {
-      imgTag = `<div style="width:60px;height:60px;background:#fde68a;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">❓</div>`;
+      imgTag = `<div class="sum-thumb" style="background:#fde68a;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">❓</div>`;
     } else if (key === 'color') {
       const css = items.map(x => x.css).filter(Boolean).join(',') || '#fde68a';
       // show first color swatch; if 2, split
       if (items.length === 1) {
-        imgTag = `<div style="width:60px;height:60px;border-radius:12px;border:2px solid #fde68a;flex-shrink:0;background:${items[0].css || '#fde68a'}"></div>`;
+        imgTag = `<div class="sum-thumb" style="border-radius:12px;border:2px solid #fde68a;flex-shrink:0;background:${items[0].css || '#fde68a'}"></div>`;
       } else {
-        imgTag = `<div style="width:60px;height:60px;border-radius:12px;border:2px solid #fde68a;flex-shrink:0;display:flex;overflow:hidden">
+        imgTag = `<div class="sum-thumb" style="border-radius:12px;border:2px solid #fde68a;flex-shrink:0;display:flex;overflow:hidden">
           <div style="flex:1;background:${items[0].css || '#fde68a'}"></div>
           <div style="flex:1;background:${items[1].css || '#fde68a'}"></div>
         </div>`;
       }
     } else if (items.length === 1) {
-      imgTag = `<img src="${items[0].img}" style="width:60px;height:60px;object-fit:cover;border-radius:12px;border:2px solid #fde68a;flex-shrink:0">`;
+      imgTag = `<img class="sum-thumb" src="${items[0].img}" style="object-fit:cover;border-radius:12px;border:2px solid #fde68a;flex-shrink:0">`;
     } else {
-      imgTag = `<div style="width:60px;height:60px;border-radius:12px;border:2px solid #fde68a;flex-shrink:0;display:flex;overflow:hidden">
+      imgTag = `<div class="sum-thumb" style="border-radius:12px;border:2px solid #fde68a;flex-shrink:0;display:flex;overflow:hidden">
         <img src="${items[0].img}" style="width:50%;height:100%;object-fit:cover">
         <img src="${items[1].img}" style="width:50%;height:100%;object-fit:cover">
       </div>`;
@@ -1338,7 +1426,7 @@ function renderSummary() {
       </div>`;
   }).join('');
   _prevSel = {
-    who: sel.who,
+    who: isMulti('who') ? getSelItems('who').map(x => ({...x})) : sel.who,
     act: getSelItems('act').map(x => ({...x})),
     style: sel.style,
     color: getSelItems('color').map(x => ({...x}))
@@ -1358,9 +1446,9 @@ function renderAll() {
   updateImageGenSection();
 
   document.getElementById('dots').innerHTML = Array.from({length:total}, (_,i)=>`
-    <span class="w-4 h-4 rounded-full transition ${i+1===step?'bg-orange-500':'bg-orange-200'} ${i+1>step?'opacity-40':''}"></span>
+    <span class="step-dot transition ${i+1===step?'bg-orange-500 text-white':'bg-orange-200'} ${i+1>step?'opacity-40':''}" aria-label="第 ${i+1} 步">${i+1}</span>
   `).join('');
-  document.getElementById('stepLabel').textContent = `第 ${step} 步 / 共 ${total} 步`;
+  document.getElementById('stepLabel').textContent = `${step}/${total}`;
   document.querySelectorAll('.step-panel').forEach((el,i)=> el.classList.toggle('active', i+1===step));
   document.getElementById('prevBtn').classList.toggle('invisible', step===1);
 
@@ -1528,11 +1616,13 @@ function getStudentName() {
 }
 function onStudentNameInput() {
   // live refresh prompt if already has picks / generated
-  if (sel.who || hasSelection('act') || sel.style || hasSelection('color') || generated) updatePrompt();
+  if (hasSelection('who') || hasSelection('act') || sel.style || hasSelection('color') || generated) updatePrompt();
 }
 
 function updatePrompt() {
-  const who = sel.who, st = sel.style;
+  const whoItems = getSelItems('who');
+  const who = whoItems[0] || null;
+  const st = sel.style;
   const actItems = getSelItems('act');
   const colItems = getSelItems('color');
   const name = getStudentName();
@@ -1569,28 +1659,36 @@ function updatePrompt() {
   const themeOpening = themeOpeningMap[currentTheme] || themeOpeningMap['mid-autumn'];
 
   updateResultPanelVisibility();
-  if (!who && !actItems.length && !st && !colItems.length) {
+  if (!whoItems.length && !actItems.length && !st && !colItems.length) {
     document.getElementById('outZh').textContent = '請先撳圖揀主角、活動、畫風、顏色。';
     document.getElementById('outCn').textContent = '请先点图选主角、活动、画风、颜色。';
     document.getElementById('outEn').textContent = 'Please pick who / action / style / color first.';
     return;
   }
 
-  // Name is optional: only inject when filled
-  let whoZh = who ? `主角係${who.zh}。` : '主角：未揀。';
-  let whoCn = who ? `主角是${who.zhCn || who.zh}。` : '主角：未选。';
-  let whoEn = who ? `Main subject: ${who.en}.` : 'Main subject: not chosen.';
-  if (name && who) {
-    if (who.id === 'me') {
+  // Name is optional: only inject when filled. who supports multi (1–2).
+  const whoLabelZh = whoItems.map(x => x.zh).join('、');
+  const whoLabelCn = whoItems.map(x => x.zhCn || x.zh).join('、');
+  const whoLabelEn = whoItems.map(x => x.en).join(', and ');
+  const hasMe = whoItems.some(x => x.id === 'me');
+  let whoZh = whoItems.length ? `主角係${whoLabelZh}。` : '主角：未揀。';
+  let whoCn = whoItems.length ? `主角是${whoLabelCn}。` : '主角：未选。';
+  let whoEn = whoItems.length ? `Main subject: ${whoLabelEn}.` : 'Main subject: not chosen.';
+  if (name && whoItems.length) {
+    if (hasMe && whoItems.length === 1) {
       whoZh = `主角係學生${name}（我自己）。`;
       whoCn = `主角是学生${name}（我自己）。`;
       whoEn = `Main subject: a student character named ${name} (myself).`;
+    } else if (hasMe) {
+      whoZh = `主角係${whoLabelZh}，學生名叫${name}。`;
+      whoCn = `主角是${whoLabelCn}，学生名叫${name}。`;
+      whoEn = `Main subjects: ${whoLabelEn}, including student ${name}.`;
     } else {
-      whoZh = `主角係${who.zh}，學生名叫${name}。`;
-      whoCn = `主角是${who.zhCn || who.zh}，学生名叫${name}。`;
-      whoEn = `Main subject: ${who.en}, student name ${name}.`;
+      whoZh = `主角係${whoLabelZh}，學生名叫${name}。`;
+      whoCn = `主角是${whoLabelCn}，学生名叫${name}。`;
+      whoEn = `Main subject: ${whoLabelEn}, student name ${name}.`;
     }
-  } else if (name && !who) {
+  } else if (name && !whoItems.length) {
     whoZh = `學生名叫${name}。主角：未揀。`;
     whoCn = `学生名叫${name}。主角：未选。`;
     whoEn = `Student name: ${name}. Main subject: not chosen.`;
@@ -1641,7 +1739,7 @@ function updatePrompt() {
 function generatePrompt() {
   commitPending();
   renderAll();
-  if (!sel.who || !hasSelection('act') || !sel.style || !hasSelection('color')) {
+  if (!hasSelection('who') || !hasSelection('act') || !sel.style || !hasSelection('color')) {
     updatePrompt();
     showToast('未揀齊四項，請繼續揀', 'bg-red-500');
     return;
@@ -1655,7 +1753,7 @@ function generatePrompt() {
 // Show the result panel only when (a) all 4 categories picked, or (b) on step 5 (confirm).
 // Hides the "複製提詞" empty-state chrome that distracts SEN students mid-flow.
 function updateResultPanelVisibility() {
-  const allPicked = !!(sel.who && hasSelection('act') && sel.style && hasSelection('color'));
+  const allPicked = !!(hasSelection('who') && hasSelection('act') && sel.style && hasSelection('color'));
   const visible = step === 5 || allPicked;
   const panel = document.getElementById('result-panel');
   if (panel) panel.classList.toggle('is-hidden', !visible);
@@ -1686,7 +1784,7 @@ function randomizeAll() {
     return b.id === a.id ? [a] : [a, b];
   };
   const d = getCurrentData();
-  sel.who = pickRand(d.who);
+  sel.who = whoMultiEnabled ? pickTwo(d.who) : pickRand(d.who);
   sel.act = pickTwo(d.act);
   sel.style = pickRand(d.style);
   sel.color = pickTwo(d.color);
@@ -1701,7 +1799,7 @@ function randomizeAll() {
 }
 
 function resetAll() {
-  sel = { who:null, act:[], style:null, color:[] };
+  sel = { who: whoMultiEnabled ? [] : null, act:[], style:null, color:[] };
   step = 1;
   generated = false;
   pendingKey = null;
@@ -1715,16 +1813,116 @@ function resetAll() {
   updatePrompt();
 }
 
-function toggleBigMode() {
-  bigMode = !bigMode;
-  document.body.classList.toggle('big-mode', bigMode);
+function applyTextScale(n, {persist=true, rerender=true} = {}) {
+  textScale = Math.max(0, Math.min(2, n|0));
+  bigMode = textScale >= 1;
+  document.body.classList.remove('text-scale-0', 'text-scale-1', 'text-scale-2', 'big-mode');
+  document.body.classList.add('text-scale-' + textScale);
+  if (bigMode) document.body.classList.add('big-mode');
   const btn = document.getElementById('bigModeBtn');
-  btn.classList.toggle('bg-orange-100', bigMode);
-  btn.classList.toggle('border-orange-400', bigMode);
-  btn.classList.toggle('text-orange-700', bigMode);
-  // Clear pending in normal mode when switching
-  if (bigMode) { clearTimeout(_pendingTimer); pendingKey = null; pendingId = null; }
-  renderAll();
+  const lab = document.getElementById('bigModeLabel');
+  if (lab) lab.textContent = TEXT_SCALE_LABELS[textScale];
+  if (btn) {
+    btn.classList.toggle('bg-orange-100', textScale >= 1);
+    btn.classList.toggle('border-orange-400', textScale >= 1);
+    btn.classList.toggle('text-orange-700', textScale >= 1);
+    btn.classList.toggle('bg-yellow-200', textScale >= 2);
+    btn.classList.toggle('border-yellow-500', textScale >= 2);
+    btn.title = '字級：' + TEXT_SCALE_LABELS[textScale] + '（再撳切換）';
+  }
+  if (textScale >= 1) { clearTimeout(_pendingTimer); pendingKey = null; pendingId = null; }
+  if (persist) { try { localStorage.setItem(TEXT_SCALE_KEY, String(textScale)); } catch {} }
+  if (rerender) renderAll();
+}
+function cycleTextScale() {
+  applyTextScale((textScale + 1) % 3);
+  showToast('字級：' + TEXT_SCALE_LABELS[textScale], textScale >= 2 ? 'bg-yellow-500' : 'bg-orange-500');
+}
+function toggleBigMode() { cycleTextScale(); } // legacy alias
+
+function setWhoMulti(on, {persist=true, rerender=true} = {}) {
+  const next = !!on;
+  if (next === whoMultiEnabled) {
+    if (rerender) updateMultiHints();
+    return;
+  }
+  if (next) {
+    // single → array
+    if (sel.who && !Array.isArray(sel.who)) sel.who = [sel.who];
+    else if (!sel.who) sel.who = [];
+    else if (!Array.isArray(sel.who)) sel.who = [];
+  } else {
+    // array → single (keep first)
+    const items = Array.isArray(sel.who) ? sel.who : (sel.who ? [sel.who] : []);
+    sel.who = items[0] || null;
+  }
+  whoMultiEnabled = next;
+  if (persist) { try { localStorage.setItem(WHO_MULTI_KEY, whoMultiEnabled ? '1' : '0'); } catch {} }
+  clearTimeout(_pendingTimer); pendingKey = null; pendingId = null;
+  if (rerender) { renderAll(); updatePrompt(); }
+}
+function toggleWhoMulti() {
+  setWhoMulti(!whoMultiEnabled);
+  showToast(whoMultiEnabled ? '主角多選已開（最多2）' : '主角改回單選', whoMultiEnabled ? 'bg-yellow-500' : 'bg-stone-500');
+}
+
+function toggleFullscreen() {
+  const doc = document;
+  const el = doc.documentElement;
+  if (!doc.fullscreenElement && !doc.webkitFullscreenElement) {
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req) req.call(el).catch(() => showToast('請用 F11 全螢幕', 'bg-blue-500'));
+  } else {
+    const ex = doc.exitFullscreen || doc.webkitExitFullscreen;
+    if (ex) ex.call(doc);
+  }
+}
+function syncFsBtn() {
+  const on = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  const btn = document.getElementById('fsBtn');
+  const ic = document.getElementById('fsIcon');
+  if (btn) btn.classList.toggle('is-fs', on);
+  if (ic) ic.className = on ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
+}
+
+function loadBoardUxPrefs() {
+  try {
+    const ts = parseInt(localStorage.getItem(TEXT_SCALE_KEY) || '0', 10);
+    applyTextScale(Number.isFinite(ts) ? ts : 0, {persist:false, rerender:false});
+  } catch { applyTextScale(0, {persist:false, rerender:false}); }
+  try {
+    setWhoMulti(localStorage.getItem(WHO_MULTI_KEY) === '1', {persist:false, rerender:false});
+  } catch {}
+}
+
+function onBoardKeydown(e) {
+  const t = e.target;
+  const tag = (t && t.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || (t && t.isContentEditable)) return;
+  if (e.key === 'Escape') return; // existing teacher modal handler
+  // Text scale: + / = / Ctrl+=  up; - / _ down
+  if ((e.key === '+' || e.key === '=') && !e.altKey) {
+    e.preventDefault();
+    applyTextScale(Math.min(2, textScale + 1));
+    showToast('字級：' + TEXT_SCALE_LABELS[textScale], 'bg-orange-500');
+    return;
+  }
+  if (e.key === '-' || e.key === '_') {
+    e.preventDefault();
+    applyTextScale(Math.max(0, textScale - 1));
+    showToast('字級：' + TEXT_SCALE_LABELS[textScale], 'bg-orange-500');
+    return;
+  }
+  // M = who multi (no ctrl required; Ctrl+M also ok)
+  if ((e.key === 'm' || e.key === 'M') && !e.altKey) {
+    e.preventDefault();
+    toggleWhoMulti();
+    return;
+  }
+  if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    e.preventDefault();
+    toggleFullscreen();
+  }
 }
 
 // ── Worksheet mode (sprint v1.2.1, feature C) ────────────────────────────
@@ -1765,7 +1963,7 @@ function toggleImageGen(on) {
 
 // Show image-gen UI only when (a) teacher enabled, (b) all 4 picked, (c) panel visible
 function updateImageGenSection() {
-  const allPicked = !!(sel.who && hasSelection('act') && sel.style && hasSelection('color'));
+  const allPicked = !!(hasSelection('who') && hasSelection('act') && sel.style && hasSelection('color'));
   const section = document.getElementById('imageGenSection');
   if (section) section.classList.toggle('hidden', !(imageGenEnabled && allPicked));
 }
@@ -1939,12 +2137,14 @@ function saveHistory(arr) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0, 20)));
 }
 function saveToHistory() {
-  if (!sel.who) { showToast('未揀任何選項', 'bg-red-500'); return; }
+  if (!hasSelection('who')) { showToast('未揀任何選項', 'bg-red-500'); return; }
+  const whoItems = getSelItems('who');
   const rec = {
     ts: new Date().toISOString(),
     name: getStudentName(),
-    whoId: sel.who.id,
-    whoZh: sel.who.zh,
+    whoId: whoItems[0] ? whoItems[0].id : null,
+    whoIds: whoItems.map(x => x.id),
+    whoZh: selLabel('who'),
     actIds: getSelItems('act').map(x => x.id),
     actZh: selLabel('act'),
     styleId: sel.style?.id || null,
@@ -1980,7 +2180,7 @@ function getExportRecords() {
     h.unshift({
       ts: new Date().toISOString(),
       name: (typeof getStudentName === 'function' ? getStudentName() : '') || '',
-      whoZh: sel.who ? sel.who.zh : '',
+      whoZh: hasSelection('who') ? selLabel('who') : '',
       actZh: typeof selLabel === 'function' ? selLabel('act') : '',
       styleZh: sel.style ? sel.style.zh : '',
       colorZh: typeof selLabel === 'function' ? selLabel('color') : '',
@@ -2164,7 +2364,18 @@ function loadHistory(idx) {
   };
 
   const hd = getCurrentData();
-  sel.who = findById(hd.who, r.whoId) || findByZh(hd.who, r.whoZh) || sel.who;
+  if (r.whoIds && r.whoIds.length) {
+    sel.who = whoMultiEnabled ? findMultiIds(hd.who, r.whoIds) : (findById(hd.who, r.whoIds[0]) || findById(hd.who, r.whoId) || sel.who);
+    if (whoMultiEnabled && (!Array.isArray(sel.who) || !sel.who.length)) {
+      const one = findById(hd.who, r.whoId) || findByZh(hd.who, (r.whoZh || '').split('、')[0]);
+      sel.who = one ? [one] : [];
+    }
+  } else if (whoMultiEnabled) {
+    const one = findById(hd.who, r.whoId) || findByZh(hd.who, r.whoZh);
+    sel.who = one ? [one] : [];
+  } else {
+    sel.who = findById(hd.who, r.whoId) || findByZh(hd.who, r.whoZh) || sel.who;
+  }
   sel.act = r.actIds ? findMultiIds(hd.act, r.actIds) : findMultiZh(hd.act, r.actZh);
   sel.style = findById(hd.style, r.styleId) || (r.styleZh ? findByZh(hd.style, r.styleZh) : null);
   sel.color = r.colorIds ? findMultiIds(hd.color, r.colorIds) : findMultiZh(hd.color, r.colorZh);
@@ -2339,6 +2550,13 @@ renderAll();
 
   function bootUI() {
     initThemeSwitcher();
+    loadBoardUxPrefs(); // before re-render so DEFAULT_COUNTS + who multi apply
+    syncFsBtn();
+    document.addEventListener('fullscreenchange', syncFsBtn);
+    document.addEventListener('webkitfullscreenchange', syncFsBtn);
+    document.addEventListener('keydown', onBoardKeydown);
+    if (typeof renderAll === 'function') renderAll();
+    if (typeof updatePrompt === 'function') updatePrompt();
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bootUI);
